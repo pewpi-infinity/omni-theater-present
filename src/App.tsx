@@ -16,7 +16,7 @@ import { QueueVideo, Fact } from '@/lib/types'
 function App() {
   const [facts, setFacts] = useKV<Fact[]>('facts', INITIAL_FACTS)
   const [queue, setQueue] = useKV<QueueVideo[]>('video-queue', [])
-  const [currentVideo, setCurrentVideo] = useKV<string>('current-video', 'https://archive.org/embed/PULP23')
+  const [currentVideo, setCurrentVideo] = useKV<string>('current-video', 'https://ia800204.us.archive.org/12/items/ComputerHackingDocumentriesMegaCollection/Hack%20-%20Pirates%20Of%20Silicon%20Valley%20%281999%29%20%28TNT%29.mp4')
   
   const [currentFactIndex, setCurrentFactIndex] = useState(0)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
