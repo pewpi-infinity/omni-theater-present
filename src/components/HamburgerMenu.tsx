@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { List, Trash, Play, Infinity, House, Sparkle, Package, Wrench, Factory, Plant, ShoppingBag } from '@phosphor-icons/react'
+import { List, Trash, Play, Infinity, House, Sparkle, Package, Wrench, Factory, Plant } from '@phosphor-icons/react'
 import { UserContent } from '@/lib/types'
 import { toast } from 'sonner'
-import { AuthComponent } from '@/components/AuthComponent'
+import { AuthComponent } from './AuthComponent'
 
 interface HamburgerMenuProps {
   onSelectVideo: (url: string, title?: string) => void
