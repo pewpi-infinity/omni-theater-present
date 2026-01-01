@@ -20,6 +20,7 @@ import { TokenDisplay } from '@/components/TokenDisplay'
 import { AdvertisingAgent } from '@/components/AdvertisingAgent'
 import { BonusQuiz } from '@/components/BonusQuiz'
 import { ContentSubmission } from '@/components/ContentSubmission'
+import { QuantumCurator } from '@/components/QuantumCurator'
 
 function App() {
   const [facts, setFacts] = useKV<Fact[]>('facts', INITIAL_FACTS)
@@ -217,6 +218,21 @@ function App() {
               </Dialog>
             </div>
           )}
+
+          <div className="flex justify-center">
+            <QuantumCurator 
+              userLogin={userLogin ?? null}
+              onImportVideo={(url, title) => {
+                const newVideo: QueueVideo = {
+                  id: Date.now().toString(),
+                  url,
+                  title,
+                  addedAt: Date.now()
+                }
+                setQueue((current) => [...(current || []), newVideo])
+              }}
+            />
+          </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

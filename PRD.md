@@ -12,6 +12,13 @@ The app combines video playback, tokenized rewards, advertising marketplace, qui
 
 ## Essential Features
 
+### Quantum-Powered Content Curation (NEW)
+- **Functionality**: AI-powered video recommendation system that analyzes user viewing intent and automatically imports top movie choices from archive.org
+- **Purpose**: Intelligently curates content based on user patterns, creating a personalized discovery experience without manual searching
+- **Trigger**: User clicks "Quantum Curation" button in header
+- **Progression**: User clicks button → AI analyzes viewing history and intent patterns → Generates 5 curated recommendations with relevance scores → Each recommendation shows title, category, reason, and match percentage → User clicks "Import" to add to queue → System learns from imports to refine future recommendations
+- **Success criteria**: Recommendations are relevant and diverse, AI adapts to user preferences over time, import process is seamless, categories match theater theme
+
 ### Video Player
 - **Functionality**: Embedded video player with full controls for theater presentation
 - **Purpose**: Primary content delivery mechanism for tech documentaries
@@ -106,18 +113,21 @@ The app combines video playback, tokenized rewards, advertising marketplace, qui
 ## Edge Case Handling
 - **Empty Queue**: Show helpful empty state with "Add video" prompt
 - **Empty Library**: Show helpful empty state when user has no content uploaded
-- **Not Signed In**: Show sign-in prompt in hamburger menu, hide authenticated features, show token features only when logged in
+- **Not Signed In**: Show sign-in prompt in hamburger menu, hide authenticated features, show token features only when logged in, quantum curation works for all users
 - **Invalid URLs**: Validate video URL format before adding to queue
 - **Long Fact Text**: Truncate or scroll very long facts to maintain layout
 - **Rapid Navigation**: Debounce fact transitions if user rapidly clicks
 - **Missing Video**: Show error state if embedded video fails to load
-- **AI Analysis Failure**: Show error toast and close dialog if quantum report fails
+- **AI Analysis Failure**: Show error toast and close dialog if quantum report or curation fails
 - **Swipe Conflicts**: Disable auto-rotation while user is dragging facts
 - **Insufficient Tokens**: Show error message when user tries to create ad without 50 tokens
 - **Quiz Already Completed**: Disable quiz button and show completion status
-- **AI Generation Errors**: Handle gracefully with error messages for ad generation or quiz creation failures
+- **AI Generation Errors**: Handle gracefully with error messages for ad generation, quiz creation, or curation failures
 - **Token Overflow**: Support large token values without UI breaking
 - **Simultaneous Sessions**: Track only current session, end previous session tokens when new video starts
+- **No Intent History**: Provide foundational computing documentaries for new users without viewing history
+- **Duplicate Imports**: Allow same video to be imported multiple times (user may want duplicates in queue)
+- **Archive.org Availability**: Handle cases where recommended videos may not be accessible
 
 ## Design Direction
 The design should evoke a 1980s computer terminal meets retro cinema aesthetic - think neon glows, scan lines, phosphor green, amber CRT monitors, and early GUI interfaces. The interface should feel like a secret computing museum theater from an alternate 1984 where technology advanced with more style.
@@ -150,34 +160,38 @@ Subtle but purposeful - focus on smooth fact transitions using fade effects and 
 
 ## Component Selection
 - **Components**:
-  - Card: For video player, facts panel, token display, ads, quiz, and content submission with custom dark styling
-  - Button: Primary actions with hover glow effects (ads, quiz, submit, token features)
-  - Dialog: For adding videos, quantum reports, ad creation
+  - Card: For video player, facts panel, token display, ads, quiz, content submission, and quantum recommendations with custom dark styling
+  - Button: Primary actions with hover glow effects (ads, quiz, submit, token features, quantum curation)
+  - Dialog: For adding videos, quantum reports, quantum curation results, ad creation
   - Input/Textarea: URL and text entry with cyber-aesthetic styling
-  - ScrollArea: For facts feed, queue list, ad feed with custom scrollbar
+  - ScrollArea: For facts feed, queue list, ad feed, quantum recommendations with custom scrollbar
+  - Badge: Category and type indicators for curated content
   - Separator: Dividing sections with neon accent lines
   - Sheet: Hamburger slide-out menu with Infinity Links and personal content
   - Slider: Speed control for fact rotation timing
   - Switch: Content type toggles (TV Show, Event)
 - **Customizations**:
+  - Quantum Curator: AI-powered recommendation dialog with animated loading states and relevance scoring
   - Token counter with live session progress and gradient background
   - Advertising feed with AI-generated descriptions and cost display
   - Quiz interface with multiple choice, answer reveal, and token rewards
   - Content submission form with type flags and validation
   - Infinity Links section with themed project navigation
   - Documentary detection system for automatic token rate adjustment
+  - Intent history tracking for personalized recommendations
 - **States**:
   - Buttons: Default (subtle glow), Hover (bright glow), Active (pulsing glow), Disabled (dimmed)
   - Token Display: Accumulating (animated counter), Static (normal display)
   - Quiz: Unanswered, Answered (correct/incorrect visual feedback), Completed
   - Ad Creation: Empty, Generating (AI loading), Filled (ready to submit)
+  - Quantum Curator: Idle, Analyzing (AI processing), Results (importable recommendations)
 - **Icon Selection**:
-  - Plus (Add to queue/library, submit)
-  - Coins, TrendUp (Token display and earnings)
-  - Megaphone, Sparkle (Advertising and AI features)
+  - Plus (Add to queue/library, submit, import)
+  - Coins, TrendUp (Token display, earnings, relevance scores)
+  - Megaphone, Sparkle (Advertising, AI features, quantum curation)
   - Brain, Check, X (Quiz system)
   - VideoCamera (Content submission)
   - Infinity (Cross-repo navigation)
   - House, Package, Wrench, Factory, Plant (Themed project icons)
 - **Spacing**: Generous padding (p-6 to p-8) around content blocks, consistent gap-4 between related elements, gap-6 between major sections, new bottom sections with gap-6 separation
-- **Mobile**: Single column stack - video on top, token display below (if logged in), facts panel, advertising and submission in stacked cards, quiz at bottom, hamburger menu slides over with full navigation
+- **Mobile**: Single column stack - video on top, quantum curation button below header, token display below (if logged in), facts panel, advertising and submission in stacked cards, quiz at bottom, hamburger menu slides over with full navigation
