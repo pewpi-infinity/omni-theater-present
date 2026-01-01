@@ -7,29 +7,45 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { Plus, Trash, ArrowRight, FilmStrip } from '@phosphor-icons/react'
+import { Slider } from '@/components/ui/slider'
+import { Plus, Trash, ArrowRight, FilmStrip, Pause, Play } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
 import { INITIAL_FACTS } from '@/lib/facts'
-import { QueueVideo, Fact } from '@/lib/types'
+import { QueueVideo, Fact, UserContent } from '@/lib/types'
+import { HamburgerMenu } from '@/components/HamburgerMenu'
+import { AuthComponent } from '@/components/AuthComponent'
+import { QuantumAnalyzer } from '@/components/QuantumAnalyzer'
 
 function App() {
   const [facts, setFacts] = useKV<Fact[]>('facts', INITIAL_FACTS)
   const [queue, setQueue] = useKV<QueueVideo[]>('video-queue', [])
   const [currentVideo, setCurrentVideo] = useKV<string>('current-video', 'https://ia800204.us.archive.org/12/items/ComputerHackingDocumentriesMegaCollection/Hack%20-%20Pirates%20Of%20Silicon%20Valley%20%281999%29%20%28TNT%29.mp4')
+  const [currentVideoTitle, setCurrentVideoTitle] = useKV<string>('current-video-title', 'Pirates of Silicon Valley')
+  const [userLogin, setUserLogin] = useKV<string | null>('user-login', null)
+  const [userContent, setUserContent] = useKV<UserContent[]>('user-content', [])
+  const [factSpeed, setFactSpeed] = useKV<number>('fact-speed', 15)
   
   const [currentFactIndex, setCurrentFactIndex] = useState(0)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isAddContentDialogOpen, setIsAddContentDialogOpen] = useState(false)
   const [newVideoUrl, setNewVideoUrl] = useState('')
   const [newVideoTitle, setNewVideoTitle] = useState('')
+  const [newContentUrl, setNewContentUrl] = useState('')
+  const [newContentTitle, setNewContentTitle] = useState('')
+  const [isPaused, setIsPaused] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
-    if (!facts || facts.length === 0) return
+    if (!facts || facts.length === 0 || isPaused) return
+    const speed = factSpeed ?? 15
     const interval = setInterval(() => {
-      setCurrentFactIndex((prev) => (prev + 1) % facts.length)
-    }, 8000)
+      if (!isDragging) {
+        setCurrentFactIndex((prev) => (prev + 1) % facts.length)
+      }
+    }, speed * 1000)
     return () => clearInterval(interval)
-  }, [facts])
+  }, [facts, factSpeed, isPaused, isDragging])
 
   const handleAddVideo = () => {
     if (!newVideoUrl.trim()) {
@@ -51,19 +67,60 @@ function App() {
     setIsAddDialogOpen(false)
   }
 
+  const handleAddContent = () => {
+    if (!userLogin) {
+      toast.error('Please sign in to add content')
+      return
+    }
+
+    if (!newContentUrl.trim()) {
+      toast.error('Please enter a video URL')
+      return
+    }
+
+    const newContent: UserContent = {
+      id: Date.now().toString(),
+      url: newContentUrl.trim(),
+      title: newContentTitle.trim() || 'Untitled Content',
+      uploadedAt: Date.now(),
+      userId: userLogin
+    }
+
+    setUserContent((current) => [...(current || []), newContent])
+    
+    toast.success('Content added to your library')
+    setNewContentUrl('')
+    setNewContentTitle('')
+    setIsAddContentDialogOpen(false)
+  }
+
   const handleRemoveVideo = (id: string) => {
     setQueue((current) => (current || []).filter((v) => v.id !== id))
     toast.success('Video removed from queue')
   }
 
-  const handlePlayVideo = (url: string) => {
+  const handlePlayVideo = (url: string, title?: string) => {
     setCurrentVideo(url)
+    setCurrentVideoTitle(title || 'Video')
     toast.success('Now playing')
   }
 
   const handleNextFact = () => {
     if (!facts || facts.length === 0) return
     setCurrentFactIndex((prev) => (prev + 1) % facts.length)
+  }
+
+  const handlePreviousFact = () => {
+    if (!facts || facts.length === 0) return
+    setCurrentFactIndex((prev) => (prev - 1 + facts.length) % facts.length)
+  }
+
+  const handleFactDragStart = () => {
+    setIsDragging(true)
+  }
+
+  const handleFactDragEnd = () => {
+    setIsDragging(false)
   }
 
   const currentFact = facts?.[currentFactIndex]
@@ -73,13 +130,79 @@ function App() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="text-center space-y-2">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-primary glow-cyan">
-            Omni Theater Presents
-          </h1>
-          <p className="text-sm md:text-base text-muted-foreground uppercase tracking-widest font-mono">
-            A Journey Through Computing History
-          </p>
+        <header className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <HamburgerMenu
+              onSelectVideo={handlePlayVideo}
+              currentVideo={currentVideo ?? ''}
+              userLogin={userLogin ?? null}
+            />
+            <div className="flex-1 text-center space-y-2">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-primary glow-cyan">
+                Omni Theater Presents
+              </h1>
+              <p className="text-sm md:text-base text-muted-foreground uppercase tracking-widest font-mono">
+                A Journey Through Computing History
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <AuthComponent userLogin={userLogin ?? null} onLoginChange={setUserLogin} />
+            </div>
+          </div>
+
+          {userLogin && (
+            <div className="flex justify-center">
+              <Dialog open={isAddContentDialogOpen} onOpenChange={setIsAddContentDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    className="border-secondary/50 hover:border-secondary hover:bg-secondary/10 text-sm"
+                  >
+                    <Plus weight="bold" className="mr-2" size={16} />
+                    Add to My Library
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="border-primary/30 bg-card">
+                  <DialogHeader>
+                    <DialogTitle className="text-primary">Add to Your Content Library</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="content-title" className="text-sm uppercase tracking-wide">
+                        Title
+                      </Label>
+                      <Input
+                        id="content-title"
+                        placeholder="Enter content title"
+                        value={newContentTitle}
+                        onChange={(e) => setNewContentTitle(e.target.value)}
+                        className="border-primary/30 focus:border-primary focus:glow-cyan bg-background/50"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="content-url" className="text-sm uppercase tracking-wide">
+                        Video URL
+                      </Label>
+                      <Input
+                        id="content-url"
+                        placeholder="https://archive.org/embed/..."
+                        value={newContentUrl}
+                        onChange={(e) => setNewContentUrl(e.target.value)}
+                        className="border-primary/30 focus:border-primary focus:glow-cyan bg-background/50 font-mono text-sm"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleAddContent}
+                      className="w-full bg-accent hover:bg-accent/80 text-accent-foreground glow-magenta"
+                    >
+                      Add to Library
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -87,48 +210,109 @@ function App() {
             <Card className="overflow-hidden border-primary/30 glow-cyan scan-lines">
               <div className="aspect-video bg-black">
                 <iframe
-                  src={currentVideo}
+                  src={currentVideo || ''}
                   className="w-full h-full"
                   allowFullScreen
                   title="Video Player"
                 />
               </div>
+              <div className="p-4 bg-card/50 backdrop-blur border-t border-primary/20">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-sm uppercase tracking-wide text-foreground">
+                    {currentVideoTitle}
+                  </h3>
+                  <QuantumAnalyzer movieTitle={currentVideoTitle || 'Video'} />
+                </div>
+              </div>
             </Card>
 
             <Card className="p-6 border-secondary/30 bg-card/50 backdrop-blur">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-h-[120px]">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={currentFactIndex}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.5 }}
-                      className="space-y-3"
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                      Fact Speed
+                    </span>
+                    <span className="text-xs font-mono text-foreground px-2 py-0.5 bg-secondary/20 rounded">
+                      {factSpeed}s
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setIsPaused(!isPaused)}
+                      className="h-8 w-8 border-secondary/50 hover:border-secondary hover:bg-secondary/10"
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono uppercase tracking-wider px-2 py-1 bg-secondary/20 text-secondary rounded border border-secondary/40">
-                          {currentFact?.category}
-                        </span>
-                        <span className="text-xs text-muted-foreground font-mono">
-                          {currentFactIndex + 1} / {safeFacts.length}
-                        </span>
-                      </div>
-                      <p className="text-base md:text-lg font-mono leading-relaxed text-foreground/90">
-                        {currentFact?.text}
-                      </p>
-                    </motion.div>
-                  </AnimatePresence>
+                      {isPaused ? (
+                        <Play className="text-secondary" weight="fill" size={16} />
+                      ) : (
+                        <Pause className="text-secondary" weight="fill" size={16} />
+                      )}
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={handleNextFact}
-                  className="shrink-0 border-primary/50 hover:border-primary hover:bg-primary/10 hover:glow-cyan transition-all"
-                >
-                  <ArrowRight className="text-primary" weight="bold" />
-                </Button>
+                
+                <Slider
+                  value={[factSpeed ?? 15]}
+                  onValueChange={(vals) => setFactSpeed(vals[0])}
+                  min={5}
+                  max={30}
+                  step={1}
+                  className="w-full"
+                />
+
+                <div className="flex items-start justify-between gap-4">
+                  <div 
+                    className="flex-1 min-h-[120px] cursor-grab active:cursor-grabbing"
+                    onMouseDown={handleFactDragStart}
+                    onMouseUp={handleFactDragEnd}
+                    onTouchStart={handleFactDragStart}
+                    onTouchEnd={handleFactDragEnd}
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={currentFactIndex}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.5 }}
+                        className="space-y-3"
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.2}
+                        onDragEnd={(e, info) => {
+                          if (info.offset.x > 100) {
+                            handlePreviousFact()
+                          } else if (info.offset.x < -100) {
+                            handleNextFact()
+                          }
+                          handleFactDragEnd()
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono uppercase tracking-wider px-2 py-1 bg-secondary/20 text-secondary rounded border border-secondary/40">
+                            {currentFact?.category}
+                          </span>
+                          <span className="text-xs text-muted-foreground font-mono">
+                            {currentFactIndex + 1} / {safeFacts.length}
+                          </span>
+                        </div>
+                        <p className="text-base md:text-lg font-mono leading-relaxed text-foreground/90">
+                          {currentFact?.text}
+                        </p>
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={handleNextFact}
+                    className="shrink-0 border-primary/50 hover:border-primary hover:bg-primary/10 hover:glow-cyan transition-all"
+                  >
+                    <ArrowRight className="text-primary" weight="bold" />
+                  </Button>
+                </div>
               </div>
             </Card>
           </div>
@@ -211,7 +395,7 @@ function App() {
                             ? 'border-primary bg-primary/5 glow-cyan'
                             : 'border-border/50 bg-card/30'
                         }`}
-                        onClick={() => handlePlayVideo(video.url)}
+                        onClick={() => handlePlayVideo(video.url, video.title)}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">

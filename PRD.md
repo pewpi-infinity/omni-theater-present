@@ -1,14 +1,14 @@
 # Planning Guide
 
-A retro-futuristic video theater platform that presents curated tech documentaries alongside a continuously streaming feed of computing history facts about IBM, Apple, Microsoft, Steve Jobs, early computing, and 1984.
+A retro-futuristic video theater platform that presents curated tech documentaries alongside a continuously streaming feed of computing history facts about IBM, Apple, Microsoft, Steve Jobs, early computing, IoT, Mongoose OS, and embedded systems. Features user authentication, personal content libraries, quantum analysis of movie titles, and interactive fact controls.
 
 **Experience Qualities**:
 1. **Cinematic** - Immersive theater-like viewing experience with atmospheric presentation
 2. **Nostalgic** - Evokes 1980s computing aesthetic with retro-futuristic design elements
 3. **Educational** - Seamlessly delivers fascinating tech history while entertaining
 
-**Complexity Level**: Light Application (multiple features with basic state)
-The app combines video playback, fact streaming, and queue management with persistent state for bookmarks and queue items.
+**Complexity Level**: Complex Application (advanced functionality with user authentication and AI features)
+The app combines video playback, fact streaming, queue management, user authentication, personal content libraries, and AI-powered quantum analysis with persistent state across sessions.
 
 ## Essential Features
 
@@ -19,12 +19,40 @@ The app combines video playback, fact streaming, and queue management with persi
 - **Progression**: User lands on page → Video player visible and ready → User plays/pauses/seeks → Video plays in theater mode
 - **Success criteria**: Video loads reliably, controls are intuitive, theater presentation feels immersive
 
-### Facts Feed
-- **Functionality**: Continuously rotating display of computing history facts with smooth transitions
-- **Purpose**: Provides educational context and entertainment during viewing
-- **Trigger**: Auto-starts on page load, cycles through facts automatically
-- **Progression**: App loads → Facts begin auto-rotating every 8 seconds → User can manually advance → Smooth fade transitions between facts
-- **Success criteria**: Facts are readable, transitions are smooth, timing feels natural, content is accurate
+### Facts Feed with Interactive Controls
+- **Functionality**: Continuously rotating display of computing history facts with smooth transitions, adjustable speed, pause/play controls, and swipe navigation
+- **Purpose**: Provides educational context and entertainment during viewing with user control
+- **Trigger**: Auto-starts on page load, cycles through facts automatically unless paused
+- **Progression**: App loads → Facts begin auto-rotating → User can adjust speed slider (5-30s) → User can pause/play → User can swipe left/right to navigate → Smooth fade transitions between facts
+- **Success criteria**: Facts are readable, transitions are smooth, timing feels natural, user controls are responsive, swipe gestures work intuitively
+
+### Quantum Report Generator
+- **Functionality**: AI-powered analysis of movie titles generating quantum computing and tech innovation perspectives
+- **Purpose**: Provides unique, engaging insights connecting movies to quantum and computing concepts
+- **Trigger**: User clicks "Quantum Report" button below video player
+- **Progression**: User clicks button → Dialog opens with loading animation → AI analyzes movie title → Report displays with analysis and 5 quantum factors → Smooth animations reveal content
+- **Success criteria**: Analysis is relevant and engaging, quantum factors are insightful, loading state is clear, animations are smooth
+
+### User Authentication
+- **Functionality**: GitHub-based user authentication with persistent login state
+- **Purpose**: Enables personalized features and content management
+- **Trigger**: User clicks "Sign In" button in header
+- **Progression**: User clicks sign in → Authentication dialog appears → User authenticates via GitHub → Welcome message → User profile displayed in header
+- **Success criteria**: Authentication is seamless, login state persists, user info displayed clearly
+
+### Personal Content Library
+- **Functionality**: Hidden hamburger menu (left side) for users to manage their uploaded content
+- **Purpose**: Allows authenticated users to create and access their own video collection
+- **Trigger**: User clicks hamburger menu icon in header
+- **Progression**: User signs in → Clicks hamburger icon → Slide-out panel opens → User can view their uploaded content → Click to play or remove items
+- **Success criteria**: Menu slides smoothly, content is filtered by user, plays correctly
+
+### Content Upload System
+- **Functionality**: Button to add personal content to library (visible when authenticated)
+- **Purpose**: Enables users to build their own video collection
+- **Trigger**: User clicks "Add to My Library" button (visible when signed in)
+- **Progression**: User is authenticated → "Add to My Library" button visible → User clicks → Dialog opens → User enters title and URL → Content saved to personal library
+- **Success criteria**: Upload is intuitive, content persists, appears in hamburger menu
 
 ### Video Queue System
 - **Functionality**: Add custom video URLs to a queue list with persistence
@@ -42,10 +70,14 @@ The app combines video playback, fact streaming, and queue management with persi
 
 ## Edge Case Handling
 - **Empty Queue**: Show helpful empty state with "Add video" prompt
+- **Empty Library**: Show helpful empty state when user has no content uploaded
+- **Not Signed In**: Show sign-in prompt in hamburger menu, hide "Add to My Library" button
 - **Invalid URLs**: Validate video URL format before adding to queue
 - **Long Fact Text**: Truncate or scroll very long facts to maintain layout
 - **Rapid Navigation**: Debounce fact transitions if user rapidly clicks
 - **Missing Video**: Show error state if embedded video fails to load
+- **AI Analysis Failure**: Show error toast and close dialog if quantum report fails
+- **Swipe Conflicts**: Disable auto-rotation while user is dragging facts
 
 ## Design Direction
 The design should evoke a 1980s computer terminal meets retro cinema aesthetic - think neon glows, scan lines, phosphor green, amber CRT monitors, and early GUI interfaces. The interface should feel like a secret computing museum theater from an alternate 1984 where technology advanced with more style.
@@ -74,29 +106,39 @@ Typography should balance retro computing aesthetics with modern readability, mi
   - Timestamps: JetBrains Mono Regular/12px/tabular numbers
 
 ## Animations
-Subtle but purposeful - focus on smooth fact transitions using fade effects and gentle slide animations. Video player controls should have satisfying micro-interactions. The overall feel should be analog warmth meeting digital precision - nothing too rapid or jarring, maintaining the contemplative theater atmosphere.
+Subtle but purposeful - focus on smooth fact transitions using fade effects and gentle slide animations. Video player controls should have satisfying micro-interactions. Quantum report reveals with staggered animations. Hamburger menu slides smoothly from left. The overall feel should be analog warmth meeting digital precision - nothing too rapid or jarring, maintaining the contemplative theater atmosphere.
 
 ## Component Selection
 - **Components**:
   - Card: For video player container and facts display panel with custom dark styling
   - Button: Primary actions (play, add) with hover glow effects
-  - Dialog: For adding new video URLs to queue
+  - Dialog: For adding new video URLs to queue and quantum reports
   - Input: URL entry field with cyber-aesthetic styling
   - ScrollArea: For facts feed and queue list with custom scrollbar
   - Separator: Dividing sections with neon accent lines
+  - Sheet: Hamburger slide-out menu for personal content library
+  - Slider: Speed control for fact rotation timing
 - **Customizations**:
-  - Custom video embed component with aspect ratio preservation
-  - Animated fact display with auto-rotation timer
+  - Custom video embed component with aspect ratio preservation and title display
+  - Animated fact display with auto-rotation timer, pause/play, and swipe gestures
   - Queue item component with thumbnail placeholder and metadata
+  - Quantum analyzer with AI integration and animated report display
+  - Auth component with GitHub user integration
+  - Hamburger menu with user-filtered content
 - **States**:
   - Buttons: Default (subtle glow), Hover (bright glow), Active (pulsing glow), Disabled (dimmed)
   - Inputs: Default (faint border), Focus (bright cyan border glow), Error (magenta border)
   - Queue items: Default, Hover (highlighted), Active/Playing (bright border)
+  - Facts: Playing (auto-rotating), Paused (static), Dragging (follows gesture)
 - **Icon Selection**:
-  - Plus (Add to queue)
-  - Play, Pause (Video controls)
-  - Trash (Remove from queue)
+  - Plus (Add to queue/library)
+  - Play, Pause (Fact control and video indicators)
+  - Trash (Remove from queue/library)
   - FilmStrip (Queue/theater icon)
   - ArrowRight (Next fact)
+  - List (Hamburger menu)
+  - User, SignOut (Authentication)
+  - Atom (Quantum analysis)
+  - Sparkle (User avatar)
 - **Spacing**: Generous padding (p-6 to p-8) around content blocks, consistent gap-4 between related elements, gap-6 between major sections
-- **Mobile**: Single column stack on mobile - video player full width on top, facts panel below, queue as expandable accordion at bottom
+- **Mobile**: Single column stack on mobile - video player full width on top, facts panel below with touch-friendly controls, queue as expandable accordion at bottom, hamburger menu slides over from left

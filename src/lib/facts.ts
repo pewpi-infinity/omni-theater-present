@@ -500,5 +500,55 @@ export const INITIAL_FACTS: Fact[] = [
     id: '100',
     text: 'Microsoft Windows 3.1, released in 1992, was the first version to require a hard drive. It sold over 3 million copies in its first two months and established Windows as the dominant PC platform.',
     category: 'Microsoft'
+  },
+  {
+    id: '101',
+    text: 'Mongoose OS is an open-source IoT firmware platform that supports ESP32, ESP8266, and other microcontrollers. It provides a JavaScript engine, cloud connectivity, and OTA updates for embedded devices.',
+    category: 'Mongoose OS'
+  },
+  {
+    id: '102',
+    text: 'Mongoose OS was created by Cesanta in 2016 to simplify IoT development. It includes built-in support for AWS IoT, Google IoT Core, Azure IoT, and private MQTT/REST servers.',
+    category: 'Mongoose OS'
+  },
+  {
+    id: '103',
+    text: 'The Mongoose OS firmware features mJS - a JavaScript engine designed for microcontrollers with as little as 50KB RAM, making high-level programming accessible on resource-constrained devices.',
+    category: 'Mongoose OS'
+  },
+  {
+    id: '104',
+    text: 'Mongoose OS provides secure device management with TLS 1.2, hardware-accelerated encryption, and secure boot capabilities. It\'s used in production IoT devices handling millions of connections daily.',
+    category: 'Mongoose OS'
+  },
+  {
+    id: '105',
+    text: 'With Mongoose OS, developers can write IoT firmware in C or JavaScript and deploy over-the-air updates. The platform includes real-time device monitoring and remote management capabilities.',
+    category: 'Mongoose OS'
+  },
+  {
+    id: '106',
+    text: 'The ESP32 microcontroller, commonly used with Mongoose OS, features dual-core processors, WiFi, Bluetooth, and costs under $5. It\'s revolutionized IoT development with its power and affordability.',
+    category: 'IoT'
+  },
+  {
+    id: '107',
+    text: 'Embedded systems power everything from your microwave to spacecraft. The Mars Curiosity rover runs on a radiation-hardened PowerPC processor - the same architecture as 1990s Macs.',
+    category: 'Embedded Systems'
+  },
+  {
+    id: '108',
+    text: 'The Arduino platform, launched in 2005, democratized embedded systems programming. Over 30 million Arduino boards have been sold, teaching millions how to build interactive electronics.',
+    category: 'IoT'
+  },
+  {
+    id: '109',
+    text: 'MQTT (Message Queuing Telemetry Transport), invented by IBM in 1999, is the backbone of IoT communication. It\'s lightweight enough for satellite links yet powers billions of connected devices.',
+    category: 'IoT'
+  },
+  {
+    id: '110',
+    text: 'Real-Time Operating Systems (RTOS) like FreeRTOS power billions of embedded devices. FreeRTOS, now owned by Amazon, runs on everything from smart thermostats to industrial robots.',
+    category: 'Embedded Systems'
   }
 ]
