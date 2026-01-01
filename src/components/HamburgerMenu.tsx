@@ -8,11 +8,13 @@ import { Separator } from '@/components/ui/separator'
 import { List, Trash, Play, Infinity, House, Sparkle, Package, Wrench, Factory, Plant, ShoppingBag } from '@phosphor-icons/react'
 import { UserContent } from '@/lib/types'
 import { toast } from 'sonner'
+import { AuthComponent } from '@/components/AuthComponent'
 
 interface HamburgerMenuProps {
   onSelectVideo: (url: string, title?: string) => void
   currentVideo: string
   userLogin: string | null
+  onLoginChange: (login: string | null) => void
 }
 
 const REPO_LINKS = [
@@ -24,7 +26,7 @@ const REPO_LINKS = [
   { name: "Luigi's Seed Repository", icon: Plant, url: '#', description: 'Heirloom Seeds' },
 ]
 
-export function HamburgerMenu({ onSelectVideo, currentVideo, userLogin }: HamburgerMenuProps) {
+export function HamburgerMenu({ onSelectVideo, currentVideo, userLogin, onLoginChange }: HamburgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [userContent, setUserContent] = useKV<UserContent[]>('user-content', [])
 
@@ -63,6 +65,14 @@ export function HamburgerMenu({ onSelectVideo, currentVideo, userLogin }: Hambur
         </SheetHeader>
         
         <div className="mt-6 space-y-6">
+          <div>
+            <h3 className="text-sm font-mono uppercase tracking-wider text-secondary mb-3">
+              Account
+            </h3>
+            <AuthComponent userLogin={userLogin} onLoginChange={onLoginChange} />
+          </div>
+
+          <Separator className="bg-border/50" />
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Infinity className="text-secondary" size={20} weight="bold" />

@@ -14,8 +14,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { INITIAL_FACTS } from '@/lib/facts'
 import { QueueVideo, Fact, UserContent } from '@/lib/types'
 import { HamburgerMenu } from '@/components/HamburgerMenu'
-import { AuthComponent } from '@/components/AuthComponent'
 import { QuantumAnalyzer } from '@/components/QuantumAnalyzer'
+import { QuantumAutoPlay } from '@/components/QuantumAutoPlay'
 import { UnifiedTokenWallet } from '@/components/UnifiedTokenWallet'
 import { AdvertisingAgent } from '@/components/AdvertisingAgent'
 import { BonusQuiz } from '@/components/BonusQuiz'
@@ -33,6 +33,7 @@ function App() {
   const [userContent, setUserContent] = useKV<UserContent[]>('user-content', [])
   const [factSpeed, setFactSpeed] = useKV<number>('fact-speed', 15)
   const [isDocumentary, setIsDocumentary] = useKV<boolean>('is-documentary', false)
+  const [videoSubtitle, setVideoSubtitle] = useState<string>('A Journey Through Computing History')
   
   const [currentFactIndex, setCurrentFactIndex] = useState(0)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -107,7 +108,7 @@ function App() {
     toast.success('Video removed from queue')
   }
 
-  const handlePlayVideo = (url: string, title?: string) => {
+  const handlePlayVideo = async (url: string, title?: string) => {
     setCurrentVideo(url)
     setCurrentVideoTitle(title || 'Video')
     
@@ -118,6 +119,17 @@ function App() {
                   titleLower.includes('tech talk') ||
                   titleLower.includes('presentation')
     setIsDocumentary(isDoc)
+    
+    try {
+      const promptText = `Generate a short, catchy subtitle (maximum 8 words) for a video titled "${title || 'Video'}". 
+The subtitle should capture the essence or theme of the content. 
+Return ONLY the subtitle text, nothing else.`
+      
+      const subtitle = await window.spark.llm(promptText, 'gpt-4o-mini', false)
+      setVideoSubtitle(subtitle.trim())
+    } catch (error) {
+      setVideoSubtitle('Discover the Story Behind Technology')
+    }
     
     toast.success('Now playing')
   }
@@ -148,23 +160,22 @@ function App() {
     <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <header className="space-y-4">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-start justify-between gap-4">
             <HamburgerMenu
               onSelectVideo={handlePlayVideo}
               currentVideo={currentVideo ?? ''}
               userLogin={userLogin ?? null}
+              onLoginChange={setUserLogin}
             />
             <div className="flex-1 text-center space-y-2">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-primary glow-cyan">
                 Omni Theater Presents
               </h1>
               <p className="text-sm md:text-base text-muted-foreground uppercase tracking-widest font-mono">
-                A Journey Through Computing History
+                {videoSubtitle}
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <AuthComponent userLogin={userLogin ?? null} onLoginChange={setUserLogin} />
-            </div>
+            <div className="w-[48px]"></div>
           </div>
 
           {userLogin && (
@@ -236,6 +247,14 @@ function App() {
             />
           </div>
         </header>
+
+        <QuantumAutoPlay
+          queue={safeQueue}
+          currentVideo={currentVideo ?? ''}
+          currentVideoTitle={currentVideoTitle ?? 'Video'}
+          onPlayNext={handlePlayVideo}
+          userLogin={userLogin ?? null}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
