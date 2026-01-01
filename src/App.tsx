@@ -16,7 +16,7 @@ import { QueueVideo, Fact, UserContent } from '@/lib/types'
 import { HamburgerMenu } from '@/components/HamburgerMenu'
 import { AuthComponent } from '@/components/AuthComponent'
 import { QuantumAnalyzer } from '@/components/QuantumAnalyzer'
-import { TokenDisplay } from '@/components/TokenDisplay'
+import { UnifiedTokenWallet } from '@/components/UnifiedTokenWallet'
 import { AdvertisingAgent } from '@/components/AdvertisingAgent'
 import { BonusQuiz } from '@/components/BonusQuiz'
 import { ContentSubmission } from '@/components/ContentSubmission'
@@ -458,7 +458,7 @@ function App() {
         </div>
 
         {userLogin && (
-          <TokenDisplay 
+          <UnifiedTokenWallet 
             userLogin={userLogin ?? null} 
             currentVideoTitle={currentVideoTitle ?? 'Video'} 
             isDocumentary={isDocumentary ?? false}

@@ -9,17 +9,16 @@ import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Megaphone, Sparkle, Link as LinkIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
-import { Advertisement, UserTokens } from '@/lib/types'
+import { Advertisement } from '@/lib/types'
 import { motion, AnimatePresence } from 'framer-motion'
+import { UnifiedWallet, AD_COST, hasEnoughTokens } from '@/lib/tokenWallet'
 
 interface AdvertisingAgentProps {
   userLogin: string | null
 }
 
-const AD_COST_TOKENS = 50
-
 export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
-  const [userTokens, setUserTokens] = useKV<UserTokens | null>('user-tokens', null)
+  const [wallet, setWallet] = useKV<UnifiedWallet | null>('unified-wallet', null)
   const [advertisements, setAdvertisements] = useKV<Advertisement[]>('advertisements', [])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -36,9 +35,9 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
 
     setIsGenerating(true)
     try {
-      const prompt = `Generate a compelling advertisement description for: "${title}". Make it engaging, professional, and concise (2-3 sentences). Focus on benefits and call-to-action. Return only the description text, no JSON.`
+      const promptText = `Generate a compelling advertisement description for: "${title}". Make it engaging, professional, and concise (2-3 sentences). Focus on benefits and call-to-action. Return only the description text, no JSON.`
       
-      const generatedDescription = await window.spark.llm(prompt, 'gpt-4o-mini', false)
+      const generatedDescription = await window.spark.llm(promptText, 'gpt-4o-mini', false)
       setDescription(generatedDescription.trim())
       toast.success('AI generated your ad description!')
     } catch (error) {
@@ -54,8 +53,8 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
       return
     }
 
-    if (!userTokens || userTokens.totalTokens < AD_COST_TOKENS) {
-      toast.error(`You need ${AD_COST_TOKENS} tokens to advertise. Keep watching to earn more!`)
+    if (!wallet || !hasEnoughTokens(wallet, AD_COST)) {
+      toast.error(`You need ${AD_COST} tokens to advertise. Keep watching to earn more!`)
       return
     }
 
@@ -71,16 +70,28 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
       description: description.trim(),
       targetUrl: targetUrl.trim(),
       createdAt: Date.now(),
-      tokensSpent: AD_COST_TOKENS,
+      tokensSpent: AD_COST,
       impressions: 0
     }
 
     setAdvertisements((current) => [...(current || []), newAd])
-    setUserTokens((prev) => {
+    setWallet((prev) => {
       if (!prev) return null
       return {
         ...prev,
-        totalTokens: prev.totalTokens - AD_COST_TOKENS
+        totalTokens: prev.totalTokens - AD_COST,
+        adsCreated: prev.adsCreated + 1,
+        transactions: [
+          ...prev.transactions,
+          {
+            id: Date.now().toString(),
+            type: 'spent',
+            amount: AD_COST,
+            reason: 'Advertisement created',
+            timestamp: Date.now()
+          }
+        ],
+        lastActivity: Date.now()
       }
     })
 
@@ -105,7 +116,7 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
                 Quantum Advertising Agent
               </h2>
               <p className="text-xs text-muted-foreground font-mono">
-                AI-powered ads • {AD_COST_TOKENS} tokens each
+                AI-powered ads • {AD_COST} tokens each
               </p>
             </div>
           </div>
@@ -175,10 +186,10 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
                 </div>
                 <div className="p-3 bg-accent/10 border border-accent/30 rounded">
                   <p className="text-xs text-muted-foreground">
-                    Cost: <span className="font-bold text-accent">{AD_COST_TOKENS} tokens</span>
-                    {userTokens && (
+                    Cost: <span className="font-bold text-accent">{AD_COST} tokens</span>
+                    {wallet && (
                       <span className="ml-2">
-                        (You have: <span className="font-bold">{userTokens.totalTokens}</span>)
+                        (You have: <span className="font-bold">{wallet.totalTokens}</span>)
                       </span>
                     )}
                   </p>

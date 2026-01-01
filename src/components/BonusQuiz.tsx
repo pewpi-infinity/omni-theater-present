@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Brain, Check, X, Sparkle } from '@phosphor-icons/react'
 import { toast } from 'sonner'
-import { Quiz, UserTokens } from '@/lib/types'
+import { Quiz } from '@/lib/types'
 import { motion, AnimatePresence } from 'framer-motion'
+import { UnifiedWallet, getQuizReward } from '@/lib/tokenWallet'
 
 interface BonusQuizProps {
   userLogin: string | null
@@ -14,7 +15,7 @@ interface BonusQuizProps {
 }
 
 export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: BonusQuizProps) {
-  const [userTokens, setUserTokens] = useKV<UserTokens | null>('user-tokens', null)
+  const [wallet, setWallet] = useKV<UnifiedWallet | null>('unified-wallet', null)
   const [completedQuizzes, setCompletedQuizzes] = useKV<string[]>('completed-quizzes', [])
   const [currentQuiz, setCurrentQuiz] = useState<Quiz | null>(null)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
@@ -37,9 +38,9 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
 
     setIsGenerating(true)
     try {
-      const bonusTokens = isDocumentary ? 10 : 5
+      const bonusTokens = getQuizReward(isDocumentary)
 
-      const prompt = `Generate a trivia question about the movie/content titled: "${currentVideoTitle}". 
+      const promptText = `Generate a trivia question about the movie/content titled: "${currentVideoTitle}". 
       Return as JSON with properties:
       - question: string (a specific trivia question)
       - options: array of 4 answer options (strings)
@@ -47,7 +48,7 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
       
       Make the question challenging but fair. Focus on computing history, technology, or the content's themes.`
       
-      const response = await window.spark.llm(prompt, 'gpt-4o-mini', true)
+      const response = await window.spark.llm(promptText, 'gpt-4o-mini', true)
       const parsed = JSON.parse(response)
 
       const quiz: Quiz = {
@@ -76,12 +77,24 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
     const isCorrect = selectedAnswer === currentQuiz.correctAnswer
 
     if (isCorrect) {
-      setUserTokens((prev) => {
+      setWallet((prev) => {
         if (!prev) return null
         return {
           ...prev,
           totalTokens: prev.totalTokens + currentQuiz.bonusTokens,
-          quizzesPassed: prev.quizzesPassed + 1
+          quizzesPassed: prev.quizzesPassed + 1,
+          transactions: [
+            ...prev.transactions,
+            {
+              id: Date.now().toString(),
+              type: 'bonus',
+              amount: currentQuiz.bonusTokens,
+              reason: 'Quiz passed',
+              timestamp: Date.now(),
+              videoTitle: currentVideoTitle
+            }
+          ],
+          lastActivity: Date.now()
         }
       })
       setCompletedQuizzes((prev) => [...(prev || []), quizKey])
