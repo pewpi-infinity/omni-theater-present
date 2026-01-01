@@ -21,6 +21,8 @@ import { AdvertisingAgent } from '@/components/AdvertisingAgent'
 import { BonusQuiz } from '@/components/BonusQuiz'
 import { ContentSubmission } from '@/components/ContentSubmission'
 import { QuantumCurator } from '@/components/QuantumCurator'
+import { TokenRedemptionStore } from '@/components/TokenRedemptionStore'
+import { PurchasedLibrary } from '@/components/PurchasedLibrary'
 
 function App() {
   const [facts, setFacts] = useKV<Fact[]>('facts', INITIAL_FACTS)
@@ -475,6 +477,10 @@ function App() {
           currentVideoTitle={currentVideoTitle ?? 'Video'} 
           isDocumentary={isDocumentary ?? false}
         />
+
+        <TokenRedemptionStore userLogin={userLogin ?? null} />
+
+        {userLogin && <PurchasedLibrary userLogin={userLogin ?? null} />}
       </div>
     </div>
   )

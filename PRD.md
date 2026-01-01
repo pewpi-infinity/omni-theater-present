@@ -140,6 +140,20 @@ The Unified Token Wallet is the central hub that consolidates:
 - **Progression**: User clicks Submit → Enters title, URL, description → Toggles content type flags → Submits → Video added to queue with type tags → Visible to all users
 - **Success criteria**: Submissions appear immediately in queue, type flags display correctly, token rates adjust for documentaries
 
+### Token Redemption Store (NEW)
+- **Functionality**: Comprehensive store where users spend tokens on exclusive content packs, premium features, profile badges, and token multiplier boosts
+- **Purpose**: Creates token economy sink, provides premium rewards for engaged users, incentivizes earning and platform usage
+- **Trigger**: Automatically visible below quiz section for all users (requires sign-in to purchase)
+- **Progression**: User views store → Browses categories (All/Videos/Features/Badges/Boosts) → Clicks item card → Reviews purchase details in confirmation dialog → Sees cost, current balance, and balance after purchase → Confirms transaction → Tokens deducted from unified wallet → Purchase recorded and displayed in Purchased Library → Transaction logged in wallet history
+- **Success criteria**: Store items are clearly categorized and visually appealing, purchase flow is intuitive with confirmation step, token deduction integrates seamlessly with unified wallet, purchases persist and appear in library, insufficient balance is handled gracefully with clear messaging, featured items stand out visually
+
+### Purchased Library (NEW)
+- **Functionality**: Display all items purchased from Token Redemption Store with timestamps and type badges
+- **Purpose**: Provides users visibility into their owned content and features, serves as trophy case for achievements
+- **Trigger**: Automatically visible below Token Redemption Store when user is signed in and has purchases
+- **Progression**: User makes purchase → Item immediately appears in library → Sorted by most recent → Shows item type icon, title, category badge, and purchase date → Empty state shown when no purchases exist
+- **Success criteria**: Library updates instantly after purchase, items are clearly categorized by type with appropriate icons and colors, chronological sorting works correctly, empty state is friendly and actionable
+
 ### Cross-Repo Navigation Hub
 - **Functionality**: Infinity Links section in hamburger menu with themed navigation to other project repos
 - **Purpose**: Creates interconnected ecosystem of project sites (Mario's Castle, Luigi's Factory, etc.)
@@ -150,7 +164,8 @@ The Unified Token Wallet is the central hub that consolidates:
 ## Edge Case Handling
 - **Empty Queue**: Show helpful empty state with "Add video" prompt
 - **Empty Library**: Show helpful empty state when user has no content uploaded
-- **Not Signed In**: Show sign-in prompt in hamburger menu, hide authenticated features, show token features only when logged in, quantum curation works for all users
+- **Empty Purchases**: Show friendly empty state encouraging store visit when no items purchased
+- **Not Signed In**: Show sign-in prompt in hamburger menu, hide authenticated features, show token features only when logged in, quantum curation works for all users, store shows sign-in required message
 - **Wallet Not Initialized**: Auto-initialize unified wallet on first sign-in with zero balance
 - **Legacy Token Data**: System automatically migrates from old token system (user-tokens) to unified wallet on user sign-in
 - **Invalid URLs**: Validate video URL format before adding to queue
@@ -159,7 +174,7 @@ The Unified Token Wallet is the central hub that consolidates:
 - **Missing Video**: Show error state if embedded video fails to load
 - **AI Analysis Failure**: Show error toast and close dialog if quantum report or curation fails
 - **Swipe Conflicts**: Disable auto-rotation while user is dragging facts
-- **Insufficient Tokens**: Unified wallet checks balance before allowing ad creation, shows clear error message
+- **Insufficient Tokens**: Unified wallet checks balance before allowing purchases, shows clear error message with needed amount, disables purchase button
 - **Quiz Already Completed**: Disable quiz button and show completion status
 - **AI Generation Errors**: Handle gracefully with error messages for ad generation, quiz creation, or curation failures
 - **Token Overflow**: Unified wallet supports large token values without UI breaking
@@ -168,6 +183,9 @@ The Unified Token Wallet is the central hub that consolidates:
 - **Duplicate Imports**: Allow same video to be imported multiple times (user may want duplicates in queue)
 - **Archive.org Availability**: Handle cases where recommended videos may not be accessible
 - **Transaction History Overflow**: Limit displayed transactions to last 10 (most recent) for performance
+- **Duplicate Purchases**: System allows re-purchasing same item (user may want multiple copies or re-activations)
+- **Store Item Availability**: All items always available (no stock limitations)
+- **Purchase During Session**: Purchases made while watching don't interrupt video playback
 
 ## Design Direction
 The design should evoke a 1980s computer terminal meets retro cinema aesthetic - think neon glows, scan lines, phosphor green, amber CRT monitors, and early GUI interfaces. The interface should feel like a secret computing museum theater from an alternate 1984 where technology advanced with more style.
@@ -200,41 +218,53 @@ Subtle but purposeful - focus on smooth fact transitions using fade effects and 
 
 ## Component Selection
 - **Components**:
-  - Card: For video player, facts panel, unified token wallet, ads, quiz, content submission, and quantum recommendations with custom dark styling
-  - Button: Primary actions with hover glow effects (ads, quiz, submit, token features, quantum curation, wallet history)
-  - Dialog: For adding videos, quantum reports, quantum curation results, ad creation, wallet transaction history
-  - Badge: Category indicators, type flags, wallet stats (quiz count, ad count)
+  - Card: For video player, facts panel, unified token wallet, ads, quiz, content submission, quantum recommendations, token store items, purchased library with custom dark styling
+  - Button: Primary actions with hover glow effects (ads, quiz, submit, token features, quantum curation, wallet history, store purchases)
+  - Dialog: For adding videos, quantum reports, quantum curation results, ad creation, wallet transaction history, purchase confirmation
+  - Badge: Category indicators, type flags, wallet stats (quiz count, ad count), store item benefits, purchase status
   - Input/Textarea: URL and text entry with cyber-aesthetic styling
-  - ScrollArea: For facts feed, queue list, ad feed, quantum recommendations, transaction history with custom scrollbar
+  - ScrollArea: For facts feed, queue list, ad feed, quantum recommendations, transaction history, store items, purchased library with custom scrollbar
   - Separator: Dividing sections with neon accent lines
   - Sheet: Hamburger slide-out menu with Infinity Links and personal content
   - Slider: Speed control for fact rotation timing
   - Switch: Content type toggles (TV Show, Event)
+  - Tabs: Store category filtering (All, Videos, Features, Badges, Boosts)
 - **Customizations**:
   - UnifiedTokenWallet: Central wallet component with real-time balance, session earnings, statistics (quiz/ad counts), transaction history dialog with earning/spending/bonus categorization
+  - TokenRedemptionStore: Full-featured store with tabbed categories, featured items highlighting, purchase confirmation flow, balance checking, and unified wallet integration
+  - PurchasedLibrary: Trophy case display with chronological sorting, type-based icons and colors, empty state guidance
   - Quantum Curator: AI-powered recommendation dialog with animated loading states and relevance scoring
-  - Token transaction types: Earned (watch time), Bonus (quizzes), Spent (ads) with distinct visual styling
+  - Token transaction types: Earned (watch time), Bonus (quizzes), Spent (ads, store purchases) with distinct visual styling
   - Advertising feed with AI-generated descriptions and unified wallet integration
   - Quiz interface with multiple choice, answer reveal, and unified wallet token deposits
   - Content submission form with type flags and validation
   - Infinity Links section with themed project navigation
   - Documentary detection system for automatic token rate adjustment in unified wallet
   - Intent history tracking for personalized recommendations
+  - Store items with multiple types: video content packs, premium features, profile badges, token multiplier boosts
 - **States**:
   - Buttons: Default (subtle glow), Hover (bright glow), Active (pulsing glow), Disabled (dimmed)
   - Unified Wallet: Idle (static balance), Earning (animated counter), Transaction updating (smooth transitions)
   - Quiz: Unanswered, Answered (correct/incorrect visual feedback), Completed
   - Ad Creation: Empty, Generating (AI loading), Filled (ready to submit), Insufficient funds (disabled)
   - Quantum Curator: Idle, Analyzing (AI processing), Results (importable recommendations)
+  - Store Items: Available (purchasable), Owned (purchased badge), Insufficient Funds (locked), Featured (highlighted)
+  - Purchase Flow: Browsing, Confirming (dialog open), Processing (transaction), Completed (success feedback)
 - **Icon Selection**:
   - Plus (Add to queue/library, submit, import)
   - Coins, TrendUp, ArrowUp, ArrowDown (Unified wallet, earnings, transactions, spending)
   - Clock (Transaction history)
-  - Sparkle (AI features, quantum curation, bonus rewards)
+  - Sparkle (AI features, quantum curation, bonus rewards, premium features)
   - Megaphone (Advertising)
   - Brain, Check, X (Quiz system)
-  - VideoCamera (Content submission)
+  - VideoCamera (Content submission, video packs)
   - Infinity (Cross-repo navigation)
   - House, Package, Wrench, Factory, Plant (Themed project icons)
-- **Spacing**: Generous padding (p-6 to p-8) around content blocks, consistent gap-4 between related elements, gap-6 between major sections, unified wallet with prominent placement
-- **Mobile**: Single column stack - video on top, quantum curation button below header, unified token wallet below (if logged in with expanded view), facts panel, advertising and submission in stacked cards, quiz at bottom, hamburger menu slides over with full navigation
+  - ShoppingCart, ShoppingBag (Store and purchases)
+  - Star, Trophy, Crown (Badges and achievements)
+  - Lightning (Token boosts and multipliers)
+  - Gift (Mystery packs)
+  - Lock (Locked/unavailable items)
+  - FilmSlate (Available for purchase)
+- **Spacing**: Generous padding (p-6 to p-8) around content blocks, consistent gap-4 between related elements, gap-6 between major sections, unified wallet with prominent placement, store with grid layout
+- **Mobile**: Single column stack - video on top, quantum curation button below header, unified token wallet below (if logged in with expanded view), facts panel, advertising and submission in stacked cards, quiz, token store (full width with responsive grid), purchased library (if has items), hamburger menu slides over with full navigation
