@@ -16,6 +16,10 @@ import { QueueVideo, Fact, UserContent } from '@/lib/types'
 import { HamburgerMenu } from '@/components/HamburgerMenu'
 import { AuthComponent } from '@/components/AuthComponent'
 import { QuantumAnalyzer } from '@/components/QuantumAnalyzer'
+import { TokenDisplay } from '@/components/TokenDisplay'
+import { AdvertisingAgent } from '@/components/AdvertisingAgent'
+import { BonusQuiz } from '@/components/BonusQuiz'
+import { ContentSubmission } from '@/components/ContentSubmission'
 
 function App() {
   const [facts, setFacts] = useKV<Fact[]>('facts', INITIAL_FACTS)
@@ -25,6 +29,7 @@ function App() {
   const [userLogin, setUserLogin] = useKV<string | null>('user-login', null)
   const [userContent, setUserContent] = useKV<UserContent[]>('user-content', [])
   const [factSpeed, setFactSpeed] = useKV<number>('fact-speed', 15)
+  const [isDocumentary, setIsDocumentary] = useKV<boolean>('is-documentary', false)
   
   const [currentFactIndex, setCurrentFactIndex] = useState(0)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -102,6 +107,15 @@ function App() {
   const handlePlayVideo = (url: string, title?: string) => {
     setCurrentVideo(url)
     setCurrentVideoTitle(title || 'Video')
+    
+    const titleLower = (title || '').toLowerCase()
+    const isDoc = titleLower.includes('documentary') || 
+                  titleLower.includes('educational') || 
+                  titleLower.includes('history') ||
+                  titleLower.includes('tech talk') ||
+                  titleLower.includes('presentation')
+    setIsDocumentary(isDoc)
+    
     toast.success('Now playing')
   }
 
@@ -426,6 +440,25 @@ function App() {
             </Card>
           </div>
         </div>
+
+        {userLogin && (
+          <TokenDisplay 
+            userLogin={userLogin ?? null} 
+            currentVideoTitle={currentVideoTitle ?? 'Video'} 
+            isDocumentary={isDocumentary ?? false}
+          />
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AdvertisingAgent userLogin={userLogin ?? null} />
+          <ContentSubmission userLogin={userLogin ?? null} />
+        </div>
+
+        <BonusQuiz 
+          userLogin={userLogin ?? null} 
+          currentVideoTitle={currentVideoTitle ?? 'Video'} 
+          isDocumentary={isDocumentary ?? false}
+        />
       </div>
     </div>
   )

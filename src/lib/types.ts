@@ -25,3 +25,39 @@ export interface UserContent {
   uploadedAt: number
   userId: string
 }
+
+export interface WatchSession {
+  id: string
+  videoTitle: string
+  startTime: number
+  endTime?: number
+  isDocumentary: boolean
+  tokensEarned: number
+}
+
+export interface UserTokens {
+  userId: string
+  totalTokens: number
+  watchSessions: WatchSession[]
+  quizzesPassed: number
+}
+
+export interface Advertisement {
+  id: string
+  userId: string
+  title: string
+  description: string
+  targetUrl: string
+  createdAt: number
+  tokensSpent: number
+  impressions: number
+}
+
+export interface Quiz {
+  id: string
+  videoTitle: string
+  question: string
+  options: string[]
+  correctAnswer: number
+  bonusTokens: number
+}
