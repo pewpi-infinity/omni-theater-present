@@ -139,10 +139,16 @@ function App() {
       })
     }
     
+    const videoTitle = title || 'Video'
+    
     try {
-      const promptText = `Generate a short, catchy subtitle (maximum 8 words) for a video titled "${title || 'Video'}". The subtitle should capture the essence or theme of the content. Return ONLY the subtitle text, nothing else.`
+      const promptParts = [
+        'Generate a short, catchy subtitle (maximum 8 words) for a video titled ',
+        '. The subtitle should capture the essence or theme of the content. Return ONLY the subtitle text, nothing else.'
+      ]
+      const prompt = promptParts[0] + videoTitle + promptParts[1]
       
-      const subtitle = await window.spark.llm(promptText, 'gpt-4o-mini', false)
+      const subtitle = await window.spark.llm(prompt, 'gpt-4o-mini', false)
       setVideoSubtitle(subtitle.trim())
     } catch (error) {
       setVideoSubtitle('Discover the Story Behind Technology')
