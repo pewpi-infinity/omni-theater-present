@@ -74,29 +74,28 @@ function AppContent() {
   }, [safeFacts.length, currentFactIndex])
 
   useEffect(() => {
-    console.log('[App] Checking Spark SDK availability...')
     let attempts = 0
-    const maxAttempts = 20
+    const maxAttempts = 30
     let timeoutId: ReturnType<typeof setTimeout>
     
     const checkInitialization = () => {
       attempts++
-      console.log(`[App] Attempt ${attempts}/${maxAttempts}`)
       
       try {
         if (typeof window !== 'undefined' && window.spark && typeof window.spark.kv === 'object') {
-          console.log('[App] ✓ Spark SDK ready!')
+          console.log('[App] Spark SDK confirmed available, initializing...')
           setIsInitialized(true)
         } else if (attempts < maxAttempts) {
-          timeoutId = setTimeout(checkInitialization, 200)
+          console.warn(`[App] Spark SDK not yet available, retrying... (attempt ${attempts}/${maxAttempts})`)
+          timeoutId = setTimeout(checkInitialization, 150)
         } else {
-          console.warn('[App] Max attempts reached, proceeding anyway')
+          console.error('[App] Spark SDK failed to load after maximum attempts')
           setIsInitialized(true)
         }
       } catch (error) {
-        console.error('[App] Error checking SDK:', error)
+        console.error('[App] Error during initialization check:', error)
         if (attempts < maxAttempts) {
-          timeoutId = setTimeout(checkInitialization, 200)
+          timeoutId = setTimeout(checkInitialization, 150)
         } else {
           setIsInitialized(true)
         }
@@ -248,11 +247,21 @@ function AppContent() {
 
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
-      console.error('[Global Error]', event.error)
+      console.error('Global error caught:', event.error)
+      try {
+        toast.error('An error occurred')
+      } catch (e) {
+        console.error('Failed to show error toast:', e)
+      }
     }
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error('[Unhandled Rejection]', event.reason)
+      console.error('Unhandled promise rejection:', event.reason)
+      try {
+        toast.error('Background operation failed')
+      } catch (e) {
+        console.error('Failed to show error toast:', e)
+      }
     }
 
     window.addEventListener('error', handleError)
@@ -265,7 +274,7 @@ function AppContent() {
   }, [])
 
   if (!isInitialized) {
-    console.log('[App] Showing loading screen')
+    console.log('[App] Not initialized, showing loading screen')
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -281,14 +290,15 @@ function AppContent() {
           </p>
           <div className="text-xs text-muted-foreground/50 space-y-1">
             <div>✓ React mounted</div>
-            <div>⏳ Initializing Spark SDK...</div>
+            <div>✓ Spark SDK loaded</div>
+            <div>⏳ Initializing state...</div>
           </div>
         </div>
       </div>
     )
   }
 
-  console.log('[App] Rendering main content')
+  console.log('[App] Rendering main content, initialized:', isInitialized, 'facts:', safeFacts.length, 'queue:', safeQueue.length)
 
   return (
     <>
