@@ -28,7 +28,7 @@ import { CommunityChat } from '@/components/CommunityChat'
 import { ViewingPartySystem } from '@/components/ViewingPartySystem'
 import { SyncedPlayback } from '@/components/SyncedPlayback'
 
-function App() {
+function AppContent() {
   const [facts, setFacts] = useKV<Fact[]>('facts', INITIAL_FACTS)
   const [queue, setQueue] = useKV<QueueVideo[]>('video-queue', [])
   const [currentVideo, setCurrentVideo] = useKV<string>('current-video', 'https://ia800204.us.archive.org/12/items/ComputerHackingDocumentriesMegaCollection/Hack%20-%20Pirates%20Of%20Silicon%20Valley%20%281999%29%20%28TNT%29.mp4')
@@ -51,17 +51,19 @@ function App() {
   const [isDragging, setIsDragging] = useState(false)
   const [currentParty, setCurrentParty] = useState<ViewingParty | null>(null)
 
+  const safeFacts = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
+  const safeQueue = Array.isArray(queue) ? queue : []
+
   useEffect(() => {
-    const safeFactsList = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
-    if (safeFactsList.length === 0 || isPaused) return
+    if (safeFacts.length === 0 || isPaused) return
     const speed = factSpeed ?? 15
     const interval = setInterval(() => {
       if (!isDragging) {
-        setCurrentFactIndex((prev) => (prev + 1) % safeFactsList.length)
+        setCurrentFactIndex((prev) => (prev + 1) % safeFacts.length)
       }
     }, speed * 1000)
     return () => clearInterval(interval)
-  }, [facts, factSpeed, isPaused, isDragging])
+  }, [safeFacts, factSpeed, isPaused, isDragging])
 
   const handleAddVideo = () => {
     if (!newVideoUrl.trim()) {
@@ -116,57 +118,60 @@ function App() {
   }
 
   const handlePlayVideo = async (url: string, title?: string) => {
-    setCurrentVideo(url)
-    setCurrentVideoTitle(title || 'Video')
-    
-    const titleLower = (title || '').toLowerCase()
-    const isDoc = titleLower.includes('documentary') || 
-                  titleLower.includes('educational') || 
-                  titleLower.includes('history') ||
-                  titleLower.includes('tech talk') ||
-                  titleLower.includes('presentation') ||
-                  titleLower.includes('pirates') ||
-                  titleLower.includes('silicon valley')
-    setIsDocumentary(isDoc)
-    
-    const isPiratesMovie = titleLower.includes('pirates') && titleLower.includes('silicon valley')
-    const fee = isPiratesMovie ? 10 : 0
-    setViewingFee(fee)
-    
-    if (fee > 0) {
-      toast.info(`Viewing fee: ${fee} tokens`, { 
-        description: 'You will earn tokens while watching!' 
-      })
-    }
-    
-    const videoTitle = title || 'Video'
-    
     try {
-      const promptParts = [
-        'Generate a short, catchy subtitle (maximum 8 words) for a video titled ',
-        '. The subtitle should capture the essence or theme of the content. Return ONLY the subtitle text, nothing else.'
-      ]
-      const prompt = promptParts[0] + videoTitle + promptParts[1]
+      setCurrentVideo(url)
+      setCurrentVideoTitle(title || 'Video')
       
-      const subtitle = await window.spark.llm(prompt, 'gpt-4o-mini', false)
-      setVideoSubtitle(subtitle.trim())
+      const titleLower = (title || '').toLowerCase()
+      const isDoc = titleLower.includes('documentary') || 
+                    titleLower.includes('educational') || 
+                    titleLower.includes('history') ||
+                    titleLower.includes('tech talk') ||
+                    titleLower.includes('presentation') ||
+                    titleLower.includes('pirates') ||
+                    titleLower.includes('silicon valley')
+      setIsDocumentary(isDoc)
+      
+      const isPiratesMovie = titleLower.includes('pirates') && titleLower.includes('silicon valley')
+      const fee = isPiratesMovie ? 10 : 0
+      setViewingFee(fee)
+      
+      if (fee > 0) {
+        toast.info(`Viewing fee: ${fee} tokens`, { 
+          description: 'You will earn tokens while watching!' 
+        })
+      }
+      
+      toast.success('Now playing')
+      
+      const videoTitle = title || 'Video'
+      
+      try {
+        const promptParts = [
+          'Generate a short, catchy subtitle (maximum 8 words) for a video titled ',
+          '. The subtitle should capture the essence or theme of the content. Return ONLY the subtitle text, nothing else.'
+        ]
+        const prompt = promptParts[0] + videoTitle + promptParts[1]
+        
+        const subtitle = await window.spark.llm(prompt, 'gpt-4o-mini', false)
+        setVideoSubtitle(subtitle.trim())
+      } catch (error) {
+        setVideoSubtitle('Discover the Story Behind Technology')
+      }
     } catch (error) {
-      setVideoSubtitle('Discover the Story Behind Technology')
+      console.error('Error playing video:', error)
+      toast.error('Error loading video')
     }
-    
-    toast.success('Now playing')
   }
 
   const handleNextFact = () => {
-    const safeFactsList = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
-    if (safeFactsList.length === 0) return
-    setCurrentFactIndex((prev) => (prev + 1) % safeFactsList.length)
+    if (safeFacts.length === 0) return
+    setCurrentFactIndex((prev) => (prev + 1) % safeFacts.length)
   }
 
   const handlePreviousFact = () => {
-    const safeFactsList = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
-    if (safeFactsList.length === 0) return
-    setCurrentFactIndex((prev) => (prev - 1 + safeFactsList.length) % safeFactsList.length)
+    if (safeFacts.length === 0) return
+    setCurrentFactIndex((prev) => (prev - 1 + safeFacts.length) % safeFacts.length)
   }
 
   const handleFactDragStart = () => {
@@ -185,9 +190,7 @@ function App() {
     setCurrentParty(null)
   }
 
-  const currentFact = facts && facts.length > 0 ? facts[currentFactIndex] : null
-  const safeQueue = Array.isArray(queue) ? queue : []
-  const safeFacts = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
+  const currentFact = safeFacts[currentFactIndex] || null
 
   return (
     <>
@@ -571,6 +574,24 @@ function App() {
       </div>
     </>
   )
+}
+
+function App() {
+  try {
+    return <AppContent />
+  } catch (error) {
+    console.error('App render error:', error)
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="p-6 max-w-md">
+          <h2 className="text-lg font-semibold text-destructive mb-2">Application Error</h2>
+          <p className="text-sm text-muted-foreground">
+            The application encountered an error. Please refresh the page.
+          </p>
+        </Card>
+      </div>
+    )
+  }
 }
 
 export default App
