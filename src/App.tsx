@@ -125,9 +125,7 @@ function App() {
     setIsDocumentary(isDoc)
     
     try {
-      const promptText = `Generate a short, catchy subtitle (maximum 8 words) for a video titled "${title || 'Video'}". 
-The subtitle should capture the essence or theme of the content. 
-Return ONLY the subtitle text, nothing else.`
+      const promptText = `Generate a short, catchy subtitle (maximum 8 words) for a video titled "${title || 'Video'}". The subtitle should capture the essence or theme of the content. Return ONLY the subtitle text, nothing else.`
       
       const subtitle = await window.spark.llm(promptText, 'gpt-4o-mini', false)
       setVideoSubtitle(subtitle.trim())
