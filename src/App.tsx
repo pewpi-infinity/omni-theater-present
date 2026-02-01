@@ -39,6 +39,7 @@ function AppContent() {
   const [isDocumentary, setIsDocumentary] = useKV<boolean>('is-documentary', true)
   const [videoSubtitle, setVideoSubtitle] = useState<string>('A Journey Through Computing History')
   const [viewingFee, setViewingFee] = useKV<number>('viewing-fee-tokens', 0)
+  const [isInitialized, setIsInitialized] = useState(false)
   
   const [currentFactIndex, setCurrentFactIndex] = useState(0)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -53,6 +54,13 @@ function AppContent() {
 
   const safeFacts = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
   const safeQueue = Array.isArray(queue) ? queue : []
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialized(true)
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     if (safeFacts.length === 0 || isPaused) return
@@ -143,18 +151,7 @@ function AppContent() {
       }
       
       toast.success('Now playing')
-      
-      const videoTitle = title || 'Video'
-      
-      try {
-        // @ts-expect-error - spark.llmPrompt template tag type inference issue
-        const prompt = window.spark.llmPrompt`Generate a short, catchy subtitle (maximum 8 words) for a video titled "${videoTitle}". The subtitle should capture the essence or theme of the content. Return ONLY the subtitle text, nothing else.`
-        
-        const subtitle = await window.spark.llm(prompt, 'gpt-4o-mini', false)
-        setVideoSubtitle(subtitle.trim())
-      } catch (error) {
-        setVideoSubtitle('Discover the Story Behind Technology')
-      }
+      setVideoSubtitle('Discover the Story Behind Technology')
     } catch (error) {
       console.error('Error playing video:', error)
       toast.error('Error loading video')
@@ -188,6 +185,25 @@ function AppContent() {
   }
 
   const currentFact = safeFacts[currentFactIndex] || null
+
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="inline-block"
+          >
+            <FilmStrip size={48} className="text-primary" weight="duotone" />
+          </motion.div>
+          <p className="text-muted-foreground font-mono text-sm">
+            Loading Omni Theater...
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>

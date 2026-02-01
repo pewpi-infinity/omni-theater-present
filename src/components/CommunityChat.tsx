@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Avatar } from '@/components/ui/avatar'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { ChatCircle, PaperPlaneRight, Users } from '@phosphor-icons/react'
 import { ChatMessage } from '@/lib/types'
@@ -162,7 +162,8 @@ export function CommunityChat({ userLogin, partyId }: CommunityChatProps) {
                     }`}
                   >
                     <Avatar className="h-8 w-8 shrink-0 border-2 border-primary/30">
-                      <img src={msg.avatarUrl} alt={msg.username} />
+                      <AvatarImage src={msg.avatarUrl} alt={msg.username} />
+                      <AvatarFallback>{msg.username.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div
                       className={`flex-1 ${
