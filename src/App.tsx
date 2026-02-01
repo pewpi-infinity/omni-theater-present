@@ -32,42 +32,43 @@ import { SafeComponent } from '@/components/SafeComponent'
 function AppContent() {
   console.log('[App] Starting render')
   
-  const [facts, setFacts] = useKV<Fact[]>('facts', INITIAL_FACTS)
-  const [queue, setQueue] = useKV<QueueVideo[]>('video-queue', [])
-  const [currentVideo, setCurrentVideo] = useKV<string>('current-video', 'https://ia800204.us.archive.org/12/items/ComputerHackingDocumentriesMegaCollection/Hack%20-%20Pirates%20Of%20Silicon%20Valley%20%281999%29%20%28TNT%29.mp4')
-  const [currentVideoTitle, setCurrentVideoTitle] = useKV<string>('current-video-title', 'Pirates of Silicon Valley')
-  const [userLogin, setUserLogin] = useKV<string | null>('user-login', null)
-  const [userContent, setUserContent] = useKV<UserContent[]>('user-content', [])
-  const [factSpeed, setFactSpeed] = useKV<number>('fact-speed', 15)
-  const [isDocumentary, setIsDocumentary] = useKV<boolean>('is-documentary', true)
-  const [videoSubtitle, setVideoSubtitle] = useState<string>('A Journey Through Computing History')
-  const [viewingFee, setViewingFee] = useKV<number>('viewing-fee-tokens', 0)
-  const [isInitialized, setIsInitialized] = useState(false)
-  const [hasError, setHasError] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string>('')
-  
-  console.log('[App] State initialized')
-  
-  const [currentFactIndex, setCurrentFactIndex] = useState(0)
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [isAddContentDialogOpen, setIsAddContentDialogOpen] = useState(false)
-  const [newVideoUrl, setNewVideoUrl] = useState('')
-  const [newVideoTitle, setNewVideoTitle] = useState('')
-  const [newContentUrl, setNewContentUrl] = useState('')
-  const [newContentTitle, setNewContentTitle] = useState('')
-  const [isPaused, setIsPaused] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
-  const [currentParty, setCurrentParty] = useState<ViewingParty | null>(null)
+  try {
+    const [facts, setFacts] = useKV<Fact[]>('facts', INITIAL_FACTS)
+    const [queue, setQueue] = useKV<QueueVideo[]>('video-queue', [])
+    const [currentVideo, setCurrentVideo] = useKV<string>('current-video', 'https://ia800204.us.archive.org/12/items/ComputerHackingDocumentriesMegaCollection/Hack%20-%20Pirates%20Of%20Silicon%20Valley%20%281999%29%20%28TNT%29.mp4')
+    const [currentVideoTitle, setCurrentVideoTitle] = useKV<string>('current-video-title', 'Pirates of Silicon Valley')
+    const [userLogin, setUserLogin] = useKV<string | null>('user-login', null)
+    const [userContent, setUserContent] = useKV<UserContent[]>('user-content', [])
+    const [factSpeed, setFactSpeed] = useKV<number>('fact-speed', 15)
+    const [isDocumentary, setIsDocumentary] = useKV<boolean>('is-documentary', true)
+    const [videoSubtitle, setVideoSubtitle] = useState<string>('A Journey Through Computing History')
+    const [viewingFee, setViewingFee] = useKV<number>('viewing-fee-tokens', 0)
+    const [isInitialized, setIsInitialized] = useState(false)
+    const [hasError, setHasError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<string>('')
+    
+    console.log('[App] State initialized')
+    
+    const [currentFactIndex, setCurrentFactIndex] = useState(0)
+    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+    const [isAddContentDialogOpen, setIsAddContentDialogOpen] = useState(false)
+    const [newVideoUrl, setNewVideoUrl] = useState('')
+    const [newVideoTitle, setNewVideoTitle] = useState('')
+    const [newContentUrl, setNewContentUrl] = useState('')
+    const [newContentTitle, setNewContentTitle] = useState('')
+    const [isPaused, setIsPaused] = useState(false)
+    const [isDragging, setIsDragging] = useState(false)
+    const [currentParty, setCurrentParty] = useState<ViewingParty | null>(null)
 
-  const safeFacts = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
-  const safeQueue = Array.isArray(queue) ? queue : []
-  
-  console.log('[App] Safe values:', { 
-    factsLength: safeFacts.length, 
-    queueLength: safeQueue.length,
-    currentVideo: currentVideo?.substring(0, 50),
-    isInitialized
-  })
+    const safeFacts = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
+    const safeQueue = Array.isArray(queue) ? queue : []
+    
+    console.log('[App] Safe values:', { 
+      factsLength: safeFacts.length, 
+      queueLength: safeQueue.length,
+      currentVideo: currentVideo?.substring(0, 50),
+      isInitialized
+    })
 
   useEffect(() => {
     if (currentFactIndex >= safeFacts.length) {
