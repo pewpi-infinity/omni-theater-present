@@ -52,9 +52,39 @@ Return a JSON object with a property "videos" containing an array of 5 video rec
 Focus on real, historically significant content from archive.org. Prioritize variety across different eras and topics.`
 
       const response = await window.spark.llm(prompt, 'gpt-4o', true)
+      
+      if (!response || typeof response !== 'string') {
+        console.error('Invalid LLM response:', response)
+        toast.error('Invalid response from AI')
+        setIsOpen(false)
+        return
+      }
+
       const parsed = JSON.parse(response)
       
-      const videos = parsed.videos || []
+      if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.videos)) {
+        console.error('Invalid parsed response:', parsed)
+        toast.error('Invalid AI response format')
+        setIsOpen(false)
+        return
+      }
+      
+      const videos = parsed.videos.filter((video: any) => 
+        video && 
+        typeof video === 'object' && 
+        video.title && 
+        video.url && 
+        video.reason && 
+        typeof video.relevanceScore === 'number' &&
+        video.category
+      )
+      
+      if (videos.length === 0) {
+        toast.error('No valid recommendations received')
+        setIsOpen(false)
+        return
+      }
+
       setCuratedVideos(videos)
       
       videos.forEach((video: CuratedVideo) => {
@@ -62,6 +92,7 @@ Focus on real, historically significant content from archive.org. Prioritize var
       })
       
     } catch (error) {
+      console.error('Quantum curation error:', error)
       toast.error('Quantum curation failed')
       setIsOpen(false)
     } finally {

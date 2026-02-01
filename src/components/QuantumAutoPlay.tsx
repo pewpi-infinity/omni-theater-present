@@ -69,9 +69,20 @@ Return a JSON object with:
 If the queue is empty or no good match exists, return videoIndex as -1.`
 
         const response = await window.spark.llm(prompt, 'gpt-4o', true)
+        
+        if (!response || typeof response !== 'string') {
+          console.error('Invalid LLM response:', response)
+          return
+        }
+
         const parsed = JSON.parse(response)
         
-        if (parsed.videoIndex >= 0 && parsed.videoIndex < queue.length) {
+        if (!parsed || typeof parsed !== 'object') {
+          console.error('Invalid parsed response:', parsed)
+          return
+        }
+        
+        if (parsed.videoIndex >= 0 && parsed.videoIndex < queue.length && parsed.reason && parsed.relevanceScore) {
           setNextRecommendation({
             video: queue[parsed.videoIndex],
             reason: parsed.reason,

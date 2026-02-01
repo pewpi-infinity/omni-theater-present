@@ -39,9 +39,23 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
       const prompt = window.spark.llmPrompt`Generate a compelling advertisement description for: "${title}". Make it engaging, professional, and concise (2-3 sentences). Focus on benefits and call-to-action. Return only the description text, no JSON.`
       
       const generatedDescription = await window.spark.llm(prompt, 'gpt-4o-mini', false)
-      setDescription(generatedDescription.trim())
+      
+      if (!generatedDescription || typeof generatedDescription !== 'string') {
+        console.error('Invalid LLM response:', generatedDescription)
+        toast.error('Invalid response from AI')
+        return
+      }
+
+      const cleanDescription = generatedDescription.trim()
+      if (cleanDescription.length === 0) {
+        toast.error('AI returned empty description')
+        return
+      }
+
+      setDescription(cleanDescription)
       toast.success('AI generated your ad description!')
     } catch (error) {
+      console.error('Ad generation error:', error)
       toast.error('Failed to generate ad')
     } finally {
       setIsGenerating(false)

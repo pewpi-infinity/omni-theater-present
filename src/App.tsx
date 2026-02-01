@@ -40,6 +40,7 @@ function AppContent() {
   const [videoSubtitle, setVideoSubtitle] = useState<string>('A Journey Through Computing History')
   const [viewingFee, setViewingFee] = useKV<number>('viewing-fee-tokens', 0)
   const [isInitialized, setIsInitialized] = useState(false)
+  const [hasError, setHasError] = useState(false)
   
   const [currentFactIndex, setCurrentFactIndex] = useState(0)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -56,6 +57,12 @@ function AppContent() {
   const safeQueue = Array.isArray(queue) ? queue : []
 
   useEffect(() => {
+    if (currentFactIndex >= safeFacts.length) {
+      setCurrentFactIndex(0)
+    }
+  }, [safeFacts.length, currentFactIndex])
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       setIsInitialized(true)
     }, 100)
@@ -64,13 +71,18 @@ function AppContent() {
 
   useEffect(() => {
     if (safeFacts.length === 0 || isPaused) return
-    const speed = factSpeed ?? 15
-    const interval = setInterval(() => {
-      if (!isDragging) {
-        setCurrentFactIndex((prev) => (prev + 1) % safeFacts.length)
-      }
-    }, speed * 1000)
-    return () => clearInterval(interval)
+    
+    try {
+      const speed = factSpeed ?? 15
+      const interval = setInterval(() => {
+        if (!isDragging) {
+          setCurrentFactIndex((prev) => (prev + 1) % safeFacts.length)
+        }
+      }, speed * 1000)
+      return () => clearInterval(interval)
+    } catch (error) {
+      console.error('Fact rotation error:', error)
+    }
   }, [safeFacts, factSpeed, isPaused, isDragging])
 
   const handleAddVideo = () => {
@@ -160,12 +172,20 @@ function AppContent() {
 
   const handleNextFact = () => {
     if (safeFacts.length === 0) return
-    setCurrentFactIndex((prev) => (prev + 1) % safeFacts.length)
+    try {
+      setCurrentFactIndex((prev) => (prev + 1) % safeFacts.length)
+    } catch (error) {
+      console.error('Error changing fact:', error)
+    }
   }
 
   const handlePreviousFact = () => {
     if (safeFacts.length === 0) return
-    setCurrentFactIndex((prev) => (prev - 1 + safeFacts.length) % safeFacts.length)
+    try {
+      setCurrentFactIndex((prev) => (prev - 1 + safeFacts.length) % safeFacts.length)
+    } catch (error) {
+      console.error('Error changing fact:', error)
+    }
   }
 
   const handleFactDragStart = () => {
@@ -185,6 +205,53 @@ function AppContent() {
   }
 
   const currentFact = safeFacts[currentFactIndex] || null
+
+  useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      console.error('Global error caught:', event.error)
+      event.preventDefault()
+      setHasError(true)
+      toast.error('An error occurred. Click reload to recover.')
+    }
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('Unhandled promise rejection:', event.reason)
+      event.preventDefault()
+      toast.error('Background operation failed')
+    }
+
+    window.addEventListener('error', handleError)
+    window.addEventListener('unhandledrejection', handleUnhandledRejection)
+
+    return () => {
+      window.removeEventListener('error', handleError)
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection)
+    }
+  }, [])
+
+  if (hasError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full p-6 border-destructive/30">
+          <div className="text-center space-y-4">
+            <div className="inline-block p-4 bg-destructive/10 rounded-full">
+              <FilmStrip size={48} className="text-destructive" weight="duotone" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground">Something Went Wrong</h2>
+            <p className="text-muted-foreground text-sm">
+              The application encountered an error. This usually happens when AI responses are invalid.
+            </p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="w-full bg-primary hover:bg-primary/80"
+            >
+              Reload Application
+            </Button>
+          </div>
+        </Card>
+      </div>
+    )
+  }
 
   if (!isInitialized) {
     return (

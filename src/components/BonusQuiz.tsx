@@ -50,7 +50,24 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
       Make the question challenging but fair. Focus on computing history, technology, or the content's themes.`
       
       const response = await window.spark.llm(prompt, 'gpt-4o-mini', true)
+      
+      if (!response || typeof response !== 'string') {
+        console.error('Invalid LLM response:', response)
+        toast.error('Invalid response from AI')
+        return
+      }
+
       const parsed = JSON.parse(response)
+      
+      if (!parsed || typeof parsed !== 'object' || 
+          !parsed.question || !Array.isArray(parsed.options) || 
+          typeof parsed.correctAnswer !== 'number' ||
+          parsed.options.length !== 4 ||
+          parsed.correctAnswer < 0 || parsed.correctAnswer > 3) {
+        console.error('Invalid quiz data:', parsed)
+        toast.error('Invalid quiz format from AI')
+        return
+      }
 
       const quiz: Quiz = {
         id: Date.now().toString(),
@@ -65,6 +82,7 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
       setSelectedAnswer(null)
       setIsRevealed(false)
     } catch (error) {
+      console.error('Quiz generation error:', error)
       toast.error('Failed to generate quiz')
     } finally {
       setIsGenerating(false)

@@ -29,17 +29,33 @@ export function QuantumAnalyzer({ movieTitle }: QuantumAnalyzerProps) {
 Keep the tone educational but fun. Return as JSON with properties: analysis (string), quantumFactors (array of 5 strings)`
 
       const response = await window.spark.llm(prompt, 'gpt-4o-mini', true)
+      
+      if (!response || typeof response !== 'string') {
+        console.error('Invalid LLM response:', response)
+        toast.error('Invalid response from AI')
+        setIsOpen(false)
+        return
+      }
+
       const parsed = JSON.parse(response)
+      
+      if (!parsed || typeof parsed !== 'object') {
+        console.error('Invalid parsed response:', parsed)
+        toast.error('Invalid AI response format')
+        setIsOpen(false)
+        return
+      }
       
       const newReport: QuantumReport = {
         movieTitle,
         timestamp: Date.now(),
         analysis: parsed.analysis || 'Quantum analysis complete.',
-        quantumFactors: parsed.quantumFactors || []
+        quantumFactors: Array.isArray(parsed.quantumFactors) ? parsed.quantumFactors : []
       }
       
       setReport(newReport)
     } catch (error) {
+      console.error('Quantum analysis error:', error)
       toast.error('Quantum analysis failed')
       setIsOpen(false)
     } finally {
