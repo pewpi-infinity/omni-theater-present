@@ -573,22 +573,6 @@ function AppContent() {
   )
 }
 
-function App() {
-  try {
-    return <AppContent />
-  } catch (error) {
-    console.error('App render error:', error)
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="p-6 max-w-md">
-          <h2 className="text-lg font-semibold text-destructive mb-2">Application Error</h2>
-          <p className="text-sm text-muted-foreground">
-            The application encountered an error. Please refresh the page.
-          </p>
-        </Card>
-      </div>
-    )
-  }
+export default function App() {
+  return <AppContent />
 }
-
-export default App
