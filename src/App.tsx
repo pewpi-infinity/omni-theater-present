@@ -33,7 +33,50 @@ function AppContent() {
   console.log('[App] Starting render')
   
   const [facts, setFacts] = useKV<Fact[]>('facts', INITIAL_FACTS)
-  const [queue, setQueue] = useKV<QueueVideo[]>('video-queue', [])
+  const [queue, setQueue] = useKV<QueueVideo[]>('video-queue', [
+    {
+      id: '1',
+      url: 'https://archive.org/embed/TechHistoryBBCDocumentary',
+      title: 'Triumph of the Nerds: The Rise of Accidental Empires',
+      addedAt: Date.now() - 6000
+    },
+    {
+      id: '2',
+      url: 'https://archive.org/embed/ComputerHistoryMuseumSteveJobs',
+      title: 'Steve Jobs: The Lost Interview (1995)',
+      addedAt: Date.now() - 5000
+    },
+    {
+      id: '3',
+      url: 'https://archive.org/embed/BBCMicroMenDocumentary',
+      title: 'Micro Men: The Story of Sinclair vs Acorn',
+      addedAt: Date.now() - 4000
+    },
+    {
+      id: '4',
+      url: 'https://archive.org/embed/CodeRushNetscape1998',
+      title: 'Code Rush: The Beginnings of Netscape/Mozilla',
+      addedAt: Date.now() - 3000
+    },
+    {
+      id: '5',
+      url: 'https://archive.org/embed/RevolutionOSLinuxDocumentary',
+      title: 'Revolution OS: The Story of Linux and Open Source',
+      addedAt: Date.now() - 2000
+    },
+    {
+      id: '6',
+      url: 'https://archive.org/embed/TheInternetHistoryBBC',
+      title: 'Download: The True Story of the Internet',
+      addedAt: Date.now() - 1000
+    },
+    {
+      id: '7',
+      url: 'https://archive.org/embed/IBMThePersonalComputerStory',
+      title: 'IBM: The Personal Computer Story',
+      addedAt: Date.now()
+    }
+  ])
   const [currentVideo, setCurrentVideo] = useKV<string>('current-video', 'https://ia800204.us.archive.org/12/items/ComputerHackingDocumentriesMegaCollection/Hack%20-%20Pirates%20Of%20Silicon%20Valley%20%281999%29%20%28TNT%29.mp4')
   const [currentVideoTitle, setCurrentVideoTitle] = useKV<string>('current-video-title', 'Pirates of Silicon Valley')
   const [userLogin, setUserLogin] = useKV<string | null>('user-login', null)
