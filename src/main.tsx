@@ -8,5 +8,5 @@ import { ErrorFallback } from './ErrorFallback.tsx'
 createRoot(document.getElementById('root')!).render(
   <ErrorBoundary FallbackComponent={ErrorFallback}>
     <App />
-   </ErrorBoundary>
+  </ErrorBoundary>
 )
