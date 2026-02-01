@@ -299,7 +299,7 @@ function App() {
                     <h3 className="font-semibold text-sm uppercase tracking-wide text-foreground">
                       {currentVideoTitle}
                     </h3>
-                    {(viewingFee ?? 0) > 0 && (
+                    {viewingFee > 0 && (
                       <div className="flex items-center gap-1 mt-1">
                         <Badge variant="outline" className="border-accent/50 text-accent text-xs">
                           Viewing Fee: {viewingFee} tokens
