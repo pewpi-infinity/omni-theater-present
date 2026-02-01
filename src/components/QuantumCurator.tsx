@@ -37,7 +37,8 @@ export function QuantumCurator({ userLogin, onImportVideo }: QuantumCuratorProps
         ? `User has previously shown interest in: ${userIntentHistory.slice(-5).join(', ')}` 
         : 'New user, focus on foundational computing documentaries'
 
-      const promptText = `You are a quantum-powered content curator for a tech documentary theater. Analyze user intent and recommend the TOP 5 most relevant computing/tech documentaries or movies.
+      // @ts-expect-error - spark.llmPrompt template tag type inference issue
+      const prompt = window.spark.llmPrompt`You are a quantum-powered content curator for a tech documentary theater. Analyze user intent and recommend the TOP 5 most relevant computing/tech documentaries or movies.
 
 ${intentContext}
 
@@ -50,7 +51,7 @@ Return a JSON object with a property "videos" containing an array of 5 video rec
 
 Focus on real, historically significant content from archive.org. Prioritize variety across different eras and topics.`
 
-      const response = await window.spark.llm(promptText, 'gpt-4o', true)
+      const response = await window.spark.llm(prompt, 'gpt-4o', true)
       const parsed = JSON.parse(response)
       
       const videos = parsed.videos || []

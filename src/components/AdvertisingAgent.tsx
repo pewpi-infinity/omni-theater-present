@@ -35,9 +35,10 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
 
     setIsGenerating(true)
     try {
-      const promptText = `Generate a compelling advertisement description for: "${title}". Make it engaging, professional, and concise (2-3 sentences). Focus on benefits and call-to-action. Return only the description text, no JSON.`
+      // @ts-expect-error - spark.llmPrompt template tag type inference issue
+      const prompt = window.spark.llmPrompt`Generate a compelling advertisement description for: "${title}". Make it engaging, professional, and concise (2-3 sentences). Focus on benefits and call-to-action. Return only the description text, no JSON.`
       
-      const generatedDescription = await window.spark.llm(promptText, 'gpt-4o-mini', false)
+      const generatedDescription = await window.spark.llm(prompt, 'gpt-4o-mini', false)
       setDescription(generatedDescription.trim())
       toast.success('AI generated your ad description!')
     } catch (error) {

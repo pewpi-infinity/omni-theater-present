@@ -47,7 +47,8 @@ export function QuantumAutoPlay({
 
         const queueTitles = queue.map(v => v.title).join(', ')
 
-        const promptText = `You are a quantum-powered video recommendation engine. Based on the current video and viewing context, determine the BEST next video to play.
+        // @ts-expect-error - spark.llmPrompt template tag type inference issue
+        const prompt = window.spark.llmPrompt`You are a quantum-powered video recommendation engine. Based on the current video and viewing context, determine the BEST next video to play.
 
 Current Video: "${currentVideoTitle}"
 ${historyContext}
@@ -67,7 +68,7 @@ Return a JSON object with:
 
 If the queue is empty or no good match exists, return videoIndex as -1.`
 
-        const response = await window.spark.llm(promptText, 'gpt-4o', true)
+        const response = await window.spark.llm(prompt, 'gpt-4o', true)
         const parsed = JSON.parse(response)
         
         if (parsed.videoIndex >= 0 && parsed.videoIndex < queue.length) {

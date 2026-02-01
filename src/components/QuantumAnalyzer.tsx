@@ -22,12 +22,13 @@ export function QuantumAnalyzer({ movieTitle }: QuantumAnalyzerProps) {
     setIsOpen(true)
     
     try {
-      const promptText = `Analyze the movie title "${movieTitle}" from a quantum computing and tech innovation perspective. Provide:
+      // @ts-expect-error - spark.llmPrompt template tag type inference issue
+      const prompt = window.spark.llmPrompt`Analyze the movie title "${movieTitle}" from a quantum computing and tech innovation perspective. Provide:
 1. A brief analysis of how the movie's themes relate to quantum computing, parallel universes, superposition, or computing innovation
 2. List 5 "quantum factors" - brief one-line connections between the movie and quantum/computing concepts
 Keep the tone educational but fun. Return as JSON with properties: analysis (string), quantumFactors (array of 5 strings)`
 
-      const response = await window.spark.llm(promptText, 'gpt-4o-mini', true)
+      const response = await window.spark.llm(prompt, 'gpt-4o-mini', true)
       const parsed = JSON.parse(response)
       
       const newReport: QuantumReport = {

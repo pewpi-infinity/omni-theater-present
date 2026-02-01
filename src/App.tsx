@@ -147,9 +147,10 @@ function AppContent() {
       const videoTitle = title || 'Video'
       
       try {
-        const promptText = `Generate a short, catchy subtitle (maximum 8 words) for a video titled "${videoTitle}". The subtitle should capture the essence or theme of the content. Return ONLY the subtitle text, nothing else.`
+        // @ts-expect-error - spark.llmPrompt template tag type inference issue
+        const prompt = window.spark.llmPrompt`Generate a short, catchy subtitle (maximum 8 words) for a video titled "${videoTitle}". The subtitle should capture the essence or theme of the content. Return ONLY the subtitle text, nothing else.`
         
-        const subtitle = await window.spark.llm(promptText, 'gpt-4o-mini', false)
+        const subtitle = await window.spark.llm(prompt, 'gpt-4o-mini', false)
         setVideoSubtitle(subtitle.trim())
       } catch (error) {
         setVideoSubtitle('Discover the Story Behind Technology')

@@ -40,7 +40,8 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
     try {
       const bonusTokens = getQuizReward(isDocumentary)
 
-      const promptText = `Generate a trivia question about the movie/content titled: "${currentVideoTitle}". 
+      // @ts-expect-error - spark.llmPrompt template tag type inference issue
+      const prompt = window.spark.llmPrompt`Generate a trivia question about the movie/content titled: "${currentVideoTitle}". 
       Return as JSON with properties:
       - question: string (a specific trivia question)
       - options: array of 4 answer options (strings)
@@ -48,7 +49,7 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
       
       Make the question challenging but fair. Focus on computing history, technology, or the content's themes.`
       
-      const response = await window.spark.llm(promptText, 'gpt-4o-mini', true)
+      const response = await window.spark.llm(prompt, 'gpt-4o-mini', true)
       const parsed = JSON.parse(response)
 
       const quiz: Quiz = {
