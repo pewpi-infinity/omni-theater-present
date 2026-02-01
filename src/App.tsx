@@ -76,13 +76,22 @@ function AppContent() {
   }, [safeFacts.length, currentFactIndex])
 
   useEffect(() => {
+    let attempts = 0
+    const maxAttempts = 50
+    
     const checkInitialization = () => {
+      attempts++
+      
       if (typeof window !== 'undefined' && window.spark) {
         console.log('[App] Spark SDK confirmed available, initializing...')
         setIsInitialized(true)
-      } else {
-        console.warn('[App] Spark SDK not yet available, retrying...')
+      } else if (attempts < maxAttempts) {
+        console.warn(`[App] Spark SDK not yet available, retrying... (attempt ${attempts}/${maxAttempts})`)
         setTimeout(checkInitialization, 100)
+      } else {
+        console.error('[App] Spark SDK failed to load after maximum attempts')
+        setHasError(true)
+        setErrorMessage('Spark SDK failed to load. Please reload the page.')
       }
     }
     
@@ -718,72 +727,5 @@ function AppContent() {
 }
 
 export default function App() {
-  console.log('[App Export] Rendering App wrapper')
-  
-  try {
-    if (typeof window === 'undefined') {
-      console.error('[App Export] Window is undefined!')
-      return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4">
-          <div className="text-white">Window not available</div>
-        </div>
-      )
-    }
-    
-    if (!window.spark) {
-      console.error('[App Export] Spark SDK not available!')
-      return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4">
-          <Card className="max-w-md w-full p-6 border-destructive/30">
-            <div className="text-center space-y-4">
-              <h2 className="text-xl font-bold text-foreground">SDK Not Available</h2>
-              <p className="text-muted-foreground text-sm">
-                The Spark SDK failed to load. Please reload the page.
-              </p>
-              <Button 
-                onClick={() => window.location.reload()} 
-                className="w-full bg-primary hover:bg-primary/80"
-              >
-                Reload Application
-              </Button>
-            </div>
-          </Card>
-        </div>
-      )
-    }
-    
-    console.log('[App Export] Rendering AppContent')
-    return <AppContent />
-  } catch (error) {
-    console.error('[App Export] Render error:', error)
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-    const errorStack = error instanceof Error ? error.stack : ''
-    
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="max-w-md w-full p-6 border-destructive/30">
-          <div className="text-center space-y-4">
-            <div className="inline-block p-4 bg-destructive/10 rounded-full">
-              <FilmStrip size={48} className="text-destructive" weight="duotone" />
-            </div>
-            <h2 className="text-xl font-bold text-foreground">Render Error</h2>
-            <p className="text-muted-foreground text-sm">
-              {errorMessage}
-            </p>
-            {errorStack && (
-              <pre className="text-xs text-left text-muted-foreground bg-muted/20 p-2 rounded max-h-32 overflow-auto font-mono">
-                {errorStack}
-              </pre>
-            )}
-            <Button 
-              onClick={() => window.location.reload()} 
-              className="w-full bg-primary hover:bg-primary/80"
-            >
-              Reload Application
-            </Button>
-          </div>
-        </Card>
-      </div>
-    )
-  }
+  return <AppContent />
 }
