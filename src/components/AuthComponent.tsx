@@ -14,9 +14,15 @@ export function AuthComponent({ userLogin, onLoginChange }: AuthComponentProps) 
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSignIn = async () => {
-    if (!window.spark || typeof window.spark.user !== 'function') {
-      toast.error('SDK not ready. Please wait a moment.')
-      console.log('[AuthComponent] Spark SDK not ready')
+    try {
+      if (typeof window === 'undefined' || !window.spark || typeof window.spark.user !== 'function') {
+        toast.error('SDK not ready. Please wait a moment.')
+        console.log('[AuthComponent] Spark SDK not ready')
+        return
+      }
+    } catch (error) {
+      console.error('[AuthComponent] Error checking SDK:', error)
+      toast.error('Unable to access authentication')
       return
     }
     

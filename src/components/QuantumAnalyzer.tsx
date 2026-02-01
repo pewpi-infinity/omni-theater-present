@@ -18,9 +18,15 @@ export function QuantumAnalyzer({ movieTitle }: QuantumAnalyzerProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
 
   const handleAnalyze = async () => {
-    if (!window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
-      toast.error('SDK not ready. Please try again in a moment.')
-      console.log('[QuantumAnalyzer] Spark SDK not ready')
+    try {
+      if (typeof window === 'undefined' || !window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
+        toast.error('SDK not ready. Please try again in a moment.')
+        console.log('[QuantumAnalyzer] Spark SDK not ready')
+        return
+      }
+    } catch (error) {
+      console.error('[QuantumAnalyzer] Error checking SDK:', error)
+      toast.error('Unable to access AI features')
       return
     }
     

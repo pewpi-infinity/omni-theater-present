@@ -29,9 +29,15 @@ export function QuantumCurator({ userLogin, onImportVideo }: QuantumCuratorProps
   const [userIntentHistory, setUserIntentHistory] = useKV<string[]>('user-intent-history', [])
 
   const handleAnalyze = async () => {
-    if (!window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
-      toast.error('SDK not ready. Please try again in a moment.')
-      console.log('[QuantumCurator] Spark SDK not ready')
+    try {
+      if (typeof window === 'undefined' || !window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
+        toast.error('SDK not ready. Please try again in a moment.')
+        console.log('[QuantumCurator] Spark SDK not ready')
+        return
+      }
+    } catch (error) {
+      console.error('[QuantumCurator] Error checking SDK:', error)
+      toast.error('Unable to access AI features')
       return
     }
     

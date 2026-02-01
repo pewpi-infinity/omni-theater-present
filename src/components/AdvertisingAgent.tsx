@@ -33,9 +33,15 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
       return
     }
 
-    if (!window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
-      toast.error('SDK not ready. Please try again in a moment.')
-      console.log('[AdvertisingAgent] Spark SDK not ready')
+    try {
+      if (typeof window === 'undefined' || !window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
+        toast.error('SDK not ready. Please try again in a moment.')
+        console.log('[AdvertisingAgent] Spark SDK not ready')
+        return
+      }
+    } catch (error) {
+      console.error('[AdvertisingAgent] Error checking SDK:', error)
+      toast.error('Unable to access AI features')
       return
     }
 

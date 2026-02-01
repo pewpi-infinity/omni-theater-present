@@ -38,42 +38,84 @@ function AppContent() {
       id: '1',
       url: 'https://archive.org/embed/TechHistoryBBCDocumentary',
       title: 'Triumph of the Nerds: The Rise of Accidental Empires',
-      addedAt: Date.now() - 6000
+      addedAt: Date.now() - 13000
     },
     {
       id: '2',
       url: 'https://archive.org/embed/ComputerHistoryMuseumSteveJobs',
       title: 'Steve Jobs: The Lost Interview (1995)',
-      addedAt: Date.now() - 5000
+      addedAt: Date.now() - 12000
     },
     {
       id: '3',
       url: 'https://archive.org/embed/BBCMicroMenDocumentary',
       title: 'Micro Men: The Story of Sinclair vs Acorn',
-      addedAt: Date.now() - 4000
+      addedAt: Date.now() - 11000
     },
     {
       id: '4',
       url: 'https://archive.org/embed/CodeRushNetscape1998',
       title: 'Code Rush: The Beginnings of Netscape/Mozilla',
-      addedAt: Date.now() - 3000
+      addedAt: Date.now() - 10000
     },
     {
       id: '5',
       url: 'https://archive.org/embed/RevolutionOSLinuxDocumentary',
       title: 'Revolution OS: The Story of Linux and Open Source',
-      addedAt: Date.now() - 2000
+      addedAt: Date.now() - 9000
     },
     {
       id: '6',
       url: 'https://archive.org/embed/TheInternetHistoryBBC',
       title: 'Download: The True Story of the Internet',
-      addedAt: Date.now() - 1000
+      addedAt: Date.now() - 8000
     },
     {
       id: '7',
       url: 'https://archive.org/embed/IBMThePersonalComputerStory',
       title: 'IBM: The Personal Computer Story',
+      addedAt: Date.now() - 7000
+    },
+    {
+      id: '8',
+      url: 'https://archive.org/embed/WarGames1983ComputerHacking',
+      title: 'WarGames (1983) - Classic Computer Hacking Film',
+      addedAt: Date.now() - 6000
+    },
+    {
+      id: '9',
+      url: 'https://archive.org/embed/TheComputerProgrammeBBC',
+      title: 'The Computer Programme - BBC Documentary Series',
+      addedAt: Date.now() - 5000
+    },
+    {
+      id: '10',
+      url: 'https://archive.org/embed/ElectricDreams1984',
+      title: 'Electric Dreams (1984) - AI and Personal Computing',
+      addedAt: Date.now() - 4000
+    },
+    {
+      id: '11',
+      url: 'https://archive.org/embed/SiliconValleyStory',
+      title: 'Silicon Valley: The Untold Story',
+      addedAt: Date.now() - 3000
+    },
+    {
+      id: '12',
+      url: 'https://archive.org/embed/ARPANETDocumentary',
+      title: 'ARPANET: The Birth of the Internet',
+      addedAt: Date.now() - 2000
+    },
+    {
+      id: '13',
+      url: 'https://archive.org/embed/TheHackersDocumentary',
+      title: 'Hackers: Wizards of the Electronic Age (1984)',
+      addedAt: Date.now() - 1000
+    },
+    {
+      id: '14',
+      url: 'https://archive.org/embed/ComputerLiteracy1982',
+      title: 'Computer Literacy Project (1982) - BBC Education',
       addedAt: Date.now()
     }
   ])
@@ -119,7 +161,7 @@ function AppContent() {
   useEffect(() => {
     console.log('[App] Checking Spark SDK availability...')
     let attempts = 0
-    const maxAttempts = 10
+    const maxAttempts = 20
     let timeoutId: ReturnType<typeof setTimeout>
     
     const checkInitialization = () => {
@@ -127,20 +169,26 @@ function AppContent() {
       console.log(`[App] Attempt ${attempts}/${maxAttempts}`)
       
       try {
-        if (typeof window !== 'undefined' && window.spark && typeof window.spark.kv === 'object') {
-          console.log('[App] ✓ Spark SDK ready!')
+        if (typeof window !== 'undefined' && 
+            window.spark && 
+            typeof window.spark.kv === 'object' &&
+            typeof window.spark.kv.get === 'function' &&
+            typeof window.spark.kv.set === 'function') {
+          console.log('[App] ✓ Spark SDK fully ready!')
           setIsInitialized(true)
         } else if (attempts < maxAttempts) {
-          timeoutId = setTimeout(checkInitialization, 100)
+          console.log('[App] SDK not ready yet, retrying...')
+          timeoutId = setTimeout(checkInitialization, 150)
         } else {
-          console.warn('[App] Max attempts reached, proceeding anyway')
+          console.warn('[App] Max attempts reached, forcing initialization')
           setIsInitialized(true)
         }
       } catch (error) {
         console.error('[App] Error checking SDK:', error)
         if (attempts < maxAttempts) {
-          timeoutId = setTimeout(checkInitialization, 100)
+          timeoutId = setTimeout(checkInitialization, 150)
         } else {
+          console.warn('[App] Forcing initialization after errors')
           setIsInitialized(true)
         }
       }

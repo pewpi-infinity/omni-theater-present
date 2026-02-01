@@ -36,8 +36,14 @@ export function QuantumAutoPlay({
 
   useEffect(() => {
     if (queue.length === 0 || isDismissed) return
-    if (!window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
-      console.log('[QuantumAutoPlay] Spark SDK not ready, skipping analysis')
+    
+    try {
+      if (typeof window === 'undefined' || !window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
+        console.log('[QuantumAutoPlay] Spark SDK not ready, skipping analysis')
+        return
+      }
+    } catch (error) {
+      console.error('[QuantumAutoPlay] Error checking SDK:', error)
       return
     }
 
