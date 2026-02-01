@@ -40,14 +40,17 @@ export function ViewingPartySystem({
   const [userInfo, setUserInfo] = useState<{ login: string; avatarUrl: string } | null>(null)
 
   useEffect(() => {
-    if (userLogin && window.spark) {
+    if (userLogin && window.spark && typeof window.spark.user === 'function') {
       window.spark.user().then((user) => {
         if (user) {
           setUserInfo({ login: user.login, avatarUrl: user.avatarUrl })
         }
       }).catch((error) => {
-        console.error('Failed to fetch user info:', error)
+        console.error('[ViewingPartySystem] Failed to fetch user info:', error)
+        setUserInfo({ login: userLogin, avatarUrl: '' })
       })
+    } else if (userLogin) {
+      setUserInfo({ login: userLogin, avatarUrl: '' })
     }
   }, [userLogin])
 

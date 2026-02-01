@@ -35,7 +35,11 @@ export function QuantumAutoPlay({
   const [isDismissed, setIsDismissed] = useState(false)
 
   useEffect(() => {
-    if (queue.length === 0 || isDismissed || !window.spark) return
+    if (queue.length === 0 || isDismissed) return
+    if (!window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
+      console.log('[QuantumAutoPlay] Spark SDK not ready, skipping analysis')
+      return
+    }
 
     const analyzeNextVideo = async () => {
       setIsAnalyzing(true)
@@ -71,14 +75,14 @@ If the queue is empty or no good match exists, return videoIndex as -1.`
         const response = await window.spark.llm(prompt, 'gpt-4o', true)
         
         if (!response || typeof response !== 'string') {
-          console.error('Invalid LLM response:', response)
+          console.error('[QuantumAutoPlay] Invalid LLM response:', response)
           return
         }
 
         const parsed = JSON.parse(response)
         
         if (!parsed || typeof parsed !== 'object') {
-          console.error('Invalid parsed response:', parsed)
+          console.error('[QuantumAutoPlay] Invalid parsed response:', parsed)
           return
         }
         
@@ -90,7 +94,7 @@ If the queue is empty or no good match exists, return videoIndex as -1.`
           })
         }
       } catch (error) {
-        console.error('Quantum analysis failed:', error)
+        console.error('[QuantumAutoPlay] Quantum analysis failed:', error)
       } finally {
         setIsAnalyzing(false)
       }

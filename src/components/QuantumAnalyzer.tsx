@@ -18,8 +18,9 @@ export function QuantumAnalyzer({ movieTitle }: QuantumAnalyzerProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
 
   const handleAnalyze = async () => {
-    if (!window.spark) {
+    if (!window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
       toast.error('SDK not ready. Please try again in a moment.')
+      console.log('[QuantumAnalyzer] Spark SDK not ready')
       return
     }
     
@@ -36,7 +37,7 @@ Keep the tone educational but fun. Return as JSON with properties: analysis (str
       const response = await window.spark.llm(prompt, 'gpt-4o-mini', true)
       
       if (!response || typeof response !== 'string') {
-        console.error('Invalid LLM response:', response)
+        console.error('[QuantumAnalyzer] Invalid LLM response:', response)
         toast.error('Invalid response from AI')
         setIsOpen(false)
         return
@@ -45,7 +46,7 @@ Keep the tone educational but fun. Return as JSON with properties: analysis (str
       const parsed = JSON.parse(response)
       
       if (!parsed || typeof parsed !== 'object') {
-        console.error('Invalid parsed response:', parsed)
+        console.error('[QuantumAnalyzer] Invalid parsed response:', parsed)
         toast.error('Invalid AI response format')
         setIsOpen(false)
         return
@@ -60,7 +61,7 @@ Keep the tone educational but fun. Return as JSON with properties: analysis (str
       
       setReport(newReport)
     } catch (error) {
-      console.error('Quantum analysis error:', error)
+      console.error('[QuantumAnalyzer] Quantum analysis error:', error)
       toast.error('Quantum analysis failed')
       setIsOpen(false)
     } finally {

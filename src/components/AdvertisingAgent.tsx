@@ -33,8 +33,9 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
       return
     }
 
-    if (!window.spark) {
+    if (!window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
       toast.error('SDK not ready. Please try again in a moment.')
+      console.log('[AdvertisingAgent] Spark SDK not ready')
       return
     }
 
@@ -46,7 +47,7 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
       const generatedDescription = await window.spark.llm(prompt, 'gpt-4o-mini', false)
       
       if (!generatedDescription || typeof generatedDescription !== 'string') {
-        console.error('Invalid LLM response:', generatedDescription)
+        console.error('[AdvertisingAgent] Invalid LLM response:', generatedDescription)
         toast.error('Invalid response from AI')
         return
       }
@@ -60,7 +61,7 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
       setDescription(cleanDescription)
       toast.success('AI generated your ad description!')
     } catch (error) {
-      console.error('Ad generation error:', error)
+      console.error('[AdvertisingAgent] Ad generation error:', error)
       toast.error('Failed to generate ad')
     } finally {
       setIsGenerating(false)

@@ -36,8 +36,9 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
       return
     }
 
-    if (!window.spark) {
+    if (!window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
       toast.error('SDK not ready. Please try again in a moment.')
+      console.log('[BonusQuiz] Spark SDK not ready')
       return
     }
 
@@ -57,7 +58,7 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
       const response = await window.spark.llm(prompt, 'gpt-4o-mini', true)
       
       if (!response || typeof response !== 'string') {
-        console.error('Invalid LLM response:', response)
+        console.error('[BonusQuiz] Invalid LLM response:', response)
         toast.error('Invalid response from AI')
         return
       }
@@ -69,7 +70,7 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
           typeof parsed.correctAnswer !== 'number' ||
           parsed.options.length !== 4 ||
           parsed.correctAnswer < 0 || parsed.correctAnswer > 3) {
-        console.error('Invalid quiz data:', parsed)
+        console.error('[BonusQuiz] Invalid quiz data:', parsed)
         toast.error('Invalid quiz format from AI')
         return
       }
@@ -87,7 +88,7 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
       setSelectedAnswer(null)
       setIsRevealed(false)
     } catch (error) {
-      console.error('Quiz generation error:', error)
+      console.error('[BonusQuiz] Quiz generation error:', error)
       toast.error('Failed to generate quiz')
     } finally {
       setIsGenerating(false)

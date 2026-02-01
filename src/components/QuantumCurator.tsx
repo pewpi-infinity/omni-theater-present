@@ -29,8 +29,9 @@ export function QuantumCurator({ userLogin, onImportVideo }: QuantumCuratorProps
   const [userIntentHistory, setUserIntentHistory] = useKV<string[]>('user-intent-history', [])
 
   const handleAnalyze = async () => {
-    if (!window.spark) {
+    if (!window.spark || typeof window.spark.llmPrompt !== 'function' || typeof window.spark.llm !== 'function') {
       toast.error('SDK not ready. Please try again in a moment.')
+      console.log('[QuantumCurator] Spark SDK not ready')
       return
     }
     
@@ -59,7 +60,7 @@ Focus on real, historically significant content from archive.org. Prioritize var
       const response = await window.spark.llm(prompt, 'gpt-4o', true)
       
       if (!response || typeof response !== 'string') {
-        console.error('Invalid LLM response:', response)
+        console.error('[QuantumCurator] Invalid LLM response:', response)
         toast.error('Invalid response from AI')
         setIsOpen(false)
         return
@@ -68,7 +69,7 @@ Focus on real, historically significant content from archive.org. Prioritize var
       const parsed = JSON.parse(response)
       
       if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.videos)) {
-        console.error('Invalid parsed response:', parsed)
+        console.error('[QuantumCurator] Invalid parsed response:', parsed)
         toast.error('Invalid AI response format')
         setIsOpen(false)
         return
@@ -97,7 +98,7 @@ Focus on real, historically significant content from archive.org. Prioritize var
       })
       
     } catch (error) {
-      console.error('Quantum curation error:', error)
+      console.error('[QuantumCurator] Quantum curation error:', error)
       toast.error('Quantum curation failed')
       setIsOpen(false)
     } finally {
