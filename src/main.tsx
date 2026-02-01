@@ -7,6 +7,16 @@ import { ErrorFallback } from './ErrorFallback.tsx'
 
 console.log('[Main] Starting application initialization')
 
+window.addEventListener('error', (event) => {
+  console.error('[Global Error Handler]', event.error)
+  event.preventDefault()
+})
+
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('[Unhandled Promise Rejection]', event.reason)
+  event.preventDefault()
+})
+
 const rootElement = document.getElementById('root')
 
 if (!rootElement) {
@@ -24,6 +34,9 @@ if (!rootElement) {
         FallbackComponent={ErrorFallback}
         onError={(error, info) => {
           console.error('[ErrorBoundary] Caught error:', error, info)
+        }}
+        onReset={() => {
+          window.location.reload()
         }}
       >
         <App />

@@ -27,6 +27,7 @@ import { PurchasedLibrary } from '@/components/PurchasedLibrary'
 import { CommunityChat } from '@/components/CommunityChat'
 import { ViewingPartySystem } from '@/components/ViewingPartySystem'
 import { SyncedPlayback } from '@/components/SyncedPlayback'
+import { SafeComponent } from '@/components/SafeComponent'
 
 function AppContent() {
   console.log('[App] Starting render')
@@ -286,6 +287,11 @@ function AppContent() {
           <p className="text-muted-foreground font-mono text-sm">
             Loading Omni Theater...
           </p>
+          <div className="text-xs text-muted-foreground/50 space-y-1">
+            <div>✓ React mounted</div>
+            <div>✓ Spark SDK loaded</div>
+            <div>⏳ Initializing state...</div>
+          </div>
         </div>
       </div>
     )
@@ -300,12 +306,14 @@ function AppContent() {
         <div className="mx-auto max-w-7xl space-y-6">
         <header className="space-y-4">
           <div className="flex items-start justify-between gap-4">
-            <HamburgerMenu
-              onSelectVideo={handlePlayVideo}
-              currentVideo={currentVideo ?? ''}
-              userLogin={userLogin ?? null}
-              onLoginChange={setUserLogin}
-            />
+            <SafeComponent componentName="HamburgerMenu">
+              <HamburgerMenu
+                onSelectVideo={handlePlayVideo}
+                currentVideo={currentVideo ?? ''}
+                userLogin={userLogin ?? null}
+                onLoginChange={setUserLogin}
+              />
+            </SafeComponent>
             <div className="flex-1 text-center space-y-2">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-primary glow-cyan">
                 Omni Theater Presents
@@ -372,28 +380,32 @@ function AppContent() {
           )}
 
           <div className="flex justify-center">
-            <QuantumCurator 
-              userLogin={userLogin ?? null}
-              onImportVideo={(url, title) => {
-                const newVideo: QueueVideo = {
-                  id: Date.now().toString(),
-                  url,
-                  title,
-                  addedAt: Date.now()
-                }
-                setQueue((current) => [...(current || []), newVideo])
-              }}
-            />
+            <SafeComponent componentName="QuantumCurator">
+              <QuantumCurator 
+                userLogin={userLogin ?? null}
+                onImportVideo={(url, title) => {
+                  const newVideo: QueueVideo = {
+                    id: Date.now().toString(),
+                    url,
+                    title,
+                    addedAt: Date.now()
+                  }
+                  setQueue((current) => [...(current || []), newVideo])
+                }}
+              />
+            </SafeComponent>
           </div>
         </header>
 
-        <QuantumAutoPlay
-          queue={safeQueue}
-          currentVideo={currentVideo ?? ''}
-          currentVideoTitle={currentVideoTitle ?? 'Video'}
-          onPlayNext={handlePlayVideo}
-          userLogin={userLogin ?? null}
-        />
+        <SafeComponent componentName="QuantumAutoPlay">
+          <QuantumAutoPlay
+            queue={safeQueue}
+            currentVideo={currentVideo ?? ''}
+            currentVideoTitle={currentVideoTitle ?? 'Video'}
+            onPlayNext={handlePlayVideo}
+            userLogin={userLogin ?? null}
+          />
+        </SafeComponent>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
@@ -627,51 +639,71 @@ function AppContent() {
         </div>
 
         {userLogin && (
-          <UnifiedTokenWallet 
-            userLogin={userLogin ?? null} 
-            currentVideoTitle={currentVideoTitle ?? 'Video'} 
-            isDocumentary={isDocumentary ?? false}
-            inParty={!!currentParty}
-          />
+          <SafeComponent componentName="UnifiedTokenWallet">
+            <UnifiedTokenWallet 
+              userLogin={userLogin ?? null} 
+              currentVideoTitle={currentVideoTitle ?? 'Video'} 
+              isDocumentary={isDocumentary ?? false}
+              inParty={!!currentParty}
+            />
+          </SafeComponent>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ViewingPartySystem
-            userLogin={userLogin ?? null}
-            currentVideo={currentVideo ?? ''}
-            currentVideoTitle={currentVideoTitle ?? 'Video'}
-            onPartyJoin={handlePartyJoin}
-            onPartyLeave={handlePartyLeave}
-            currentParty={currentParty}
-          />
+          <SafeComponent componentName="ViewingPartySystem">
+            <ViewingPartySystem
+              userLogin={userLogin ?? null}
+              currentVideo={currentVideo ?? ''}
+              currentVideoTitle={currentVideoTitle ?? 'Video'}
+              onPartyJoin={handlePartyJoin}
+              onPartyLeave={handlePartyLeave}
+              currentParty={currentParty}
+            />
+          </SafeComponent>
           <div className="space-y-6">
-            <AdvertisingAgent userLogin={userLogin ?? null} />
-            <ContentSubmission userLogin={userLogin ?? null} />
+            <SafeComponent componentName="AdvertisingAgent">
+              <AdvertisingAgent userLogin={userLogin ?? null} />
+            </SafeComponent>
+            <SafeComponent componentName="ContentSubmission">
+              <ContentSubmission userLogin={userLogin ?? null} />
+            </SafeComponent>
           </div>
         </div>
 
-        <BonusQuiz 
-          userLogin={userLogin ?? null} 
-          currentVideoTitle={currentVideoTitle ?? 'Video'} 
-          isDocumentary={isDocumentary ?? false}
-        />
+        <SafeComponent componentName="BonusQuiz">
+          <BonusQuiz 
+            userLogin={userLogin ?? null} 
+            currentVideoTitle={currentVideoTitle ?? 'Video'} 
+            isDocumentary={isDocumentary ?? false}
+          />
+        </SafeComponent>
 
-        <TokenRedemptionStore userLogin={userLogin ?? null} />
+        <SafeComponent componentName="TokenRedemptionStore">
+          <TokenRedemptionStore userLogin={userLogin ?? null} />
+        </SafeComponent>
 
-        {userLogin && <PurchasedLibrary userLogin={userLogin ?? null} />}
+        {userLogin && (
+          <SafeComponent componentName="PurchasedLibrary">
+            <PurchasedLibrary userLogin={userLogin ?? null} />
+          </SafeComponent>
+        )}
       </div>
 
-      <SyncedPlayback
-        partyId={currentParty?.id ?? null}
-        isHost={currentParty?.hostId === userLogin}
-        userLogin={userLogin ?? null}
-        onVideoChange={handlePlayVideo}
-      />
+      <SafeComponent componentName="SyncedPlayback">
+        <SyncedPlayback
+          partyId={currentParty?.id ?? null}
+          isHost={currentParty?.hostId === userLogin}
+          userLogin={userLogin ?? null}
+          onVideoChange={handlePlayVideo}
+        />
+      </SafeComponent>
 
-      <CommunityChat 
-        userLogin={userLogin ?? null}
-        partyId={currentParty?.id}
-      />
+      <SafeComponent componentName="CommunityChat">
+        <CommunityChat 
+          userLogin={userLogin ?? null}
+          partyId={currentParty?.id}
+        />
+      </SafeComponent>
       </div>
     </>
   )
@@ -683,7 +715,11 @@ export default function App() {
   try {
     if (typeof window === 'undefined') {
       console.error('[App Export] Window is undefined!')
-      return <div>Window not available</div>
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="text-white">Window not available</div>
+        </div>
+      )
     }
     
     if (!window.spark) {
@@ -712,14 +748,25 @@ export default function App() {
     return <AppContent />
   } catch (error) {
     console.error('[App Export] Render error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+    const errorStack = error instanceof Error ? error.stack : ''
+    
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-md w-full p-6 border-destructive/30">
           <div className="text-center space-y-4">
+            <div className="inline-block p-4 bg-destructive/10 rounded-full">
+              <FilmStrip size={48} className="text-destructive" weight="duotone" />
+            </div>
             <h2 className="text-xl font-bold text-foreground">Render Error</h2>
             <p className="text-muted-foreground text-sm">
-              {error instanceof Error ? error.message : 'Unknown error occurred'}
+              {errorMessage}
             </p>
+            {errorStack && (
+              <pre className="text-xs text-left text-muted-foreground bg-muted/20 p-2 rounded max-h-32 overflow-auto">
+                {errorStack}
+              </pre>
+            )}
             <Button 
               onClick={() => window.location.reload()} 
               className="w-full bg-primary hover:bg-primary/80"
