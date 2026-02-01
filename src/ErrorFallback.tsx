@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Warning, ArrowClockwise } from '@phosphor-icons/react'
+import { Warning } from '@phosphor-icons/react'
 
 interface ErrorFallbackProps {
   error: Error
@@ -10,40 +10,39 @@ interface ErrorFallbackProps {
 export function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="max-w-lg w-full p-6 border-destructive/30 bg-card space-y-4">
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-destructive/10 rounded-lg">
-            <Warning size={32} className="text-destructive" weight="fill" />
+      <Card className="max-w-2xl w-full p-6 border-destructive/30 bg-card/50">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Warning size={32} className="text-destructive shrink-0" weight="fill" />
+            <div>
+              <h1 className="text-xl font-bold text-destructive">Application Error</h1>
+              <p className="text-sm text-muted-foreground">
+                Something went wrong. Please try refreshing the page.
+              </p>
+            </div>
           </div>
-          <div className="flex-1 space-y-2">
-            <h2 className="text-xl font-bold text-destructive">
-              Application Error
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Something went wrong and the application crashed.
+          
+          <div className="bg-background/50 p-4 rounded border border-border/50">
+            <p className="text-sm font-mono text-foreground/80">
+              {error.message}
             </p>
           </div>
+          
+          <div className="flex gap-3">
+            <Button
+              onClick={resetErrorBoundary}
+              className="bg-primary hover:bg-primary/80"
+            >
+              Try Again
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => window.location.reload()}
+            >
+              Refresh Page
+            </Button>
+          </div>
         </div>
-        
-        <div className="p-4 bg-background rounded-lg border border-border">
-          <p className="text-xs font-mono text-destructive break-words">
-            {error.message}
-          </p>
-        </div>
-
-        <div className="flex gap-2">
-          <Button
-            onClick={resetErrorBoundary}
-            className="flex-1 bg-primary hover:bg-primary/80"
-          >
-            <ArrowClockwise size={16} className="mr-2" weight="bold" />
-            Reload Application
-          </Button>
-        </div>
-
-        <p className="text-xs text-muted-foreground text-center">
-          If this error persists, please check the browser console for more details.
-        </p>
       </Card>
     </div>
   )

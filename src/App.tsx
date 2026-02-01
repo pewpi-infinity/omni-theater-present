@@ -76,7 +76,7 @@ function AppContent() {
   useEffect(() => {
     console.log('[App] Checking Spark SDK availability...')
     let attempts = 0
-    const maxAttempts = 20
+    const maxAttempts = 10
     let timeoutId: ReturnType<typeof setTimeout>
     
     const checkInitialization = () => {
@@ -88,7 +88,7 @@ function AppContent() {
           console.log('[App] ✓ Spark SDK ready!')
           setIsInitialized(true)
         } else if (attempts < maxAttempts) {
-          timeoutId = setTimeout(checkInitialization, 200)
+          timeoutId = setTimeout(checkInitialization, 100)
         } else {
           console.warn('[App] Max attempts reached, proceeding anyway')
           setIsInitialized(true)
@@ -96,14 +96,14 @@ function AppContent() {
       } catch (error) {
         console.error('[App] Error checking SDK:', error)
         if (attempts < maxAttempts) {
-          timeoutId = setTimeout(checkInitialization, 200)
+          timeoutId = setTimeout(checkInitialization, 100)
         } else {
           setIsInitialized(true)
         }
       }
     }
     
-    timeoutId = setTimeout(checkInitialization, 100)
+    checkInitialization()
     return () => {
       if (timeoutId) clearTimeout(timeoutId)
     }
