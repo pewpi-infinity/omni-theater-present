@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 import { Plus, Trash, ArrowRight, FilmStrip, Pause, Play } from '@phosphor-icons/react'
-import { toast } from 'sonner'
+import { toast, Toaster } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
 import { INITIAL_FACTS } from '@/lib/facts'
 import { QueueVideo, Fact, UserContent, ViewingParty } from '@/lib/types'
@@ -169,8 +169,10 @@ Return ONLY the subtitle text, nothing else.`
   const safeFacts = facts || []
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
-      <div className="mx-auto max-w-7xl space-y-6">
+    <>
+      <Toaster position="top-center" />
+      <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
+        <div className="mx-auto max-w-7xl space-y-6">
         <header className="space-y-4">
           <div className="flex items-start justify-between gap-4">
             <HamburgerMenu
@@ -536,7 +538,8 @@ Return ONLY the subtitle text, nothing else.`
         userLogin={userLogin ?? null}
         partyId={currentParty?.id}
       />
-    </div>
+      </div>
+    </>
   )
 }
 
