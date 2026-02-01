@@ -52,11 +52,12 @@ function App() {
   const [currentParty, setCurrentParty] = useState<ViewingParty | null>(null)
 
   useEffect(() => {
-    if (!facts || facts.length === 0 || isPaused) return
+    const safeFactsList = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
+    if (safeFactsList.length === 0 || isPaused) return
     const speed = factSpeed ?? 15
     const interval = setInterval(() => {
       if (!isDragging) {
-        setCurrentFactIndex((prev) => (prev + 1) % facts.length)
+        setCurrentFactIndex((prev) => (prev + 1) % safeFactsList.length)
       }
     }, speed * 1000)
     return () => clearInterval(interval)
@@ -151,13 +152,15 @@ function App() {
   }
 
   const handleNextFact = () => {
-    if (!facts || facts.length === 0) return
-    setCurrentFactIndex((prev) => (prev + 1) % facts.length)
+    const safeFactsList = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
+    if (safeFactsList.length === 0) return
+    setCurrentFactIndex((prev) => (prev + 1) % safeFactsList.length)
   }
 
   const handlePreviousFact = () => {
-    if (!facts || facts.length === 0) return
-    setCurrentFactIndex((prev) => (prev - 1 + facts.length) % facts.length)
+    const safeFactsList = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
+    if (safeFactsList.length === 0) return
+    setCurrentFactIndex((prev) => (prev - 1 + safeFactsList.length) % safeFactsList.length)
   }
 
   const handleFactDragStart = () => {
@@ -176,9 +179,9 @@ function App() {
     setCurrentParty(null)
   }
 
-  const currentFact = facts?.[currentFactIndex]
-  const safeQueue = queue || []
-  const safeFacts = facts || []
+  const currentFact = facts && facts.length > 0 ? facts[currentFactIndex] : null
+  const safeQueue = Array.isArray(queue) ? queue : []
+  const safeFacts = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
 
   return (
     <>
@@ -299,10 +302,10 @@ function App() {
                     <h3 className="font-semibold text-sm uppercase tracking-wide text-foreground">
                       {currentVideoTitle}
                     </h3>
-                    {viewingFee > 0 && (
+                    {(viewingFee ?? 0) > 0 && (
                       <div className="flex items-center gap-1 mt-1">
                         <Badge variant="outline" className="border-accent/50 text-accent text-xs">
-                          Viewing Fee: {viewingFee} tokens
+                          Viewing Fee: {viewingFee ?? 0} tokens
                         </Badge>
                       </div>
                     )}
@@ -378,14 +381,14 @@ function App() {
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-mono uppercase tracking-wider px-2 py-1 bg-secondary/20 text-secondary rounded border border-secondary/40">
-                            {currentFact?.category}
+                            {currentFact?.category || 'Computing'}
                           </span>
                           <span className="text-xs text-muted-foreground font-mono">
                             {currentFactIndex + 1} / {safeFacts.length}
                           </span>
                         </div>
                         <p className="text-base md:text-lg font-mono leading-relaxed text-foreground/90">
-                          {currentFact?.text}
+                          {currentFact?.text || 'Loading facts...'}
                         </p>
                       </motion.div>
                     </AnimatePresence>
