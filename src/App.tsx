@@ -69,6 +69,7 @@ function AppContent() {
     isInitialized
   })
 
+  useEffect(() => {
     if (currentFactIndex >= safeFacts.length) {
       setCurrentFactIndex(0)
     }
