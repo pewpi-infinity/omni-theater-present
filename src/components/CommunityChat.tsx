@@ -19,7 +19,7 @@ interface CommunityChatProps {
 export function CommunityChat({ userLogin, partyId }: CommunityChatProps) {
   const [messages, setMessages] = useKV<ChatMessage[]>('community-chat', [])
   const [partyMessages, setPartyMessages] = useKV<ChatMessage[]>(
-    partyId ? `party-chat-${partyId}` : 'temp',
+    `party-chat-${partyId || 'none'}`,
     []
   )
   const [newMessage, setNewMessage] = useState('')

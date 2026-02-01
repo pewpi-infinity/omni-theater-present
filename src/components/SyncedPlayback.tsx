@@ -26,7 +26,7 @@ export function SyncedPlayback({
   onVideoChange
 }: SyncedPlaybackProps) {
   const [playbackState, setPlaybackState] = useKV<PlaybackState | null>(
-    partyId ? `playback-${partyId}` : 'temp',
+    `playback-${partyId || 'none'}`,
     null
   )
   const lastSyncRef = useRef<number>(0)

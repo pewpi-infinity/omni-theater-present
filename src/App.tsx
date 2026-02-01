@@ -29,6 +29,8 @@ import { ViewingPartySystem } from '@/components/ViewingPartySystem'
 import { SyncedPlayback } from '@/components/SyncedPlayback'
 
 function AppContent() {
+  console.log('[App] Starting render')
+  
   const [facts, setFacts] = useKV<Fact[]>('facts', INITIAL_FACTS)
   const [queue, setQueue] = useKV<QueueVideo[]>('video-queue', [])
   const [currentVideo, setCurrentVideo] = useKV<string>('current-video', 'https://ia800204.us.archive.org/12/items/ComputerHackingDocumentriesMegaCollection/Hack%20-%20Pirates%20Of%20Silicon%20Valley%20%281999%29%20%28TNT%29.mp4')
@@ -41,6 +43,9 @@ function AppContent() {
   const [viewingFee, setViewingFee] = useKV<number>('viewing-fee-tokens', 0)
   const [isInitialized, setIsInitialized] = useState(false)
   const [hasError, setHasError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  
+  console.log('[App] State initialized')
   
   const [currentFactIndex, setCurrentFactIndex] = useState(0)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -55,6 +60,13 @@ function AppContent() {
 
   const safeFacts = Array.isArray(facts) && facts.length > 0 ? facts : INITIAL_FACTS
   const safeQueue = Array.isArray(queue) ? queue : []
+  
+  console.log('[App] Safe values:', { 
+    factsLength: safeFacts.length, 
+    queueLength: safeQueue.length,
+    currentVideo: currentVideo?.substring(0, 50),
+    isInitialized
+  })
 
   useEffect(() => {
     if (currentFactIndex >= safeFacts.length) {
@@ -211,12 +223,15 @@ function AppContent() {
       console.error('Global error caught:', event.error)
       event.preventDefault()
       setHasError(true)
+      setErrorMessage(event.error?.message || 'Unknown error occurred')
       toast.error('An error occurred. Click reload to recover.')
     }
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       console.error('Unhandled promise rejection:', event.reason)
       event.preventDefault()
+      setHasError(true)
+      setErrorMessage(event.reason?.message || 'Promise rejection occurred')
       toast.error('Background operation failed')
     }
 
@@ -239,7 +254,10 @@ function AppContent() {
             </div>
             <h2 className="text-xl font-bold text-foreground">Something Went Wrong</h2>
             <p className="text-muted-foreground text-sm">
-              The application encountered an error. This usually happens when AI responses are invalid.
+              The application encountered an error: {errorMessage || 'Unknown error'}
+            </p>
+            <p className="text-muted-foreground text-xs">
+              This usually happens when AI responses are invalid or when there's a data issue.
             </p>
             <Button 
               onClick={() => window.location.reload()} 
@@ -254,6 +272,7 @@ function AppContent() {
   }
 
   if (!isInitialized) {
+    console.log('[App] Not initialized, showing loading screen')
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -271,6 +290,8 @@ function AppContent() {
       </div>
     )
   }
+
+  console.log('[App] Rendering main content')
 
   return (
     <>
@@ -657,5 +678,57 @@ function AppContent() {
 }
 
 export default function App() {
-  return <AppContent />
+  console.log('[App Export] Rendering App wrapper')
+  
+  try {
+    if (typeof window === 'undefined') {
+      console.error('[App Export] Window is undefined!')
+      return <div>Window not available</div>
+    }
+    
+    if (!window.spark) {
+      console.error('[App Export] Spark SDK not available!')
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <Card className="max-w-md w-full p-6 border-destructive/30">
+            <div className="text-center space-y-4">
+              <h2 className="text-xl font-bold text-foreground">SDK Not Available</h2>
+              <p className="text-muted-foreground text-sm">
+                The Spark SDK failed to load. Please reload the page.
+              </p>
+              <Button 
+                onClick={() => window.location.reload()} 
+                className="w-full bg-primary hover:bg-primary/80"
+              >
+                Reload Application
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )
+    }
+    
+    console.log('[App Export] Rendering AppContent')
+    return <AppContent />
+  } catch (error) {
+    console.error('[App Export] Render error:', error)
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full p-6 border-destructive/30">
+          <div className="text-center space-y-4">
+            <h2 className="text-xl font-bold text-foreground">Render Error</h2>
+            <p className="text-muted-foreground text-sm">
+              {error instanceof Error ? error.message : 'Unknown error occurred'}
+            </p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="w-full bg-primary hover:bg-primary/80"
+            >
+              Reload Application
+            </Button>
+          </div>
+        </Card>
+      </div>
+    )
+  }
 }
