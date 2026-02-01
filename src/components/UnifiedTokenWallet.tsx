@@ -14,9 +14,10 @@ interface UnifiedTokenWalletProps {
   userLogin: string | null
   currentVideoTitle: string
   isDocumentary: boolean
+  inParty?: boolean
 }
 
-export function UnifiedTokenWallet({ userLogin, currentVideoTitle, isDocumentary }: UnifiedTokenWalletProps) {
+export function UnifiedTokenWallet({ userLogin, currentVideoTitle, isDocumentary, inParty = false }: UnifiedTokenWalletProps) {
   const [wallet, setWallet] = useKV<UnifiedWallet | null>('unified-wallet', null)
   const [currentSession, setCurrentSession] = useKV<WatchSession | null>('current-watch-session', null)
 
@@ -53,7 +54,8 @@ export function UnifiedTokenWallet({ userLogin, currentVideoTitle, isDocumentary
     const interval = setInterval(() => {
       const now = Date.now()
       const elapsedHours = (now - currentSession.startTime) / (1000 * 60 * 60)
-      const tokensPerHour = getTokenRate(currentSession.isDocumentary)
+      const baseTokensPerHour = getTokenRate(currentSession.isDocumentary)
+      const tokensPerHour = inParty ? baseTokensPerHour * 1.5 : baseTokensPerHour
       const earnedTokens = Math.floor(elapsedHours * tokensPerHour)
 
       if (earnedTokens > currentSession.tokensEarned) {
@@ -78,7 +80,7 @@ export function UnifiedTokenWallet({ userLogin, currentVideoTitle, isDocumentary
                 id: Date.now().toString(),
                 type: 'earned',
                 amount: newTokens,
-                reason: 'Watch time',
+                reason: inParty ? 'Watch time (Party Bonus +50%)' : 'Watch time',
                 timestamp: Date.now(),
                 videoTitle: currentSession.videoTitle
               }
@@ -90,7 +92,7 @@ export function UnifiedTokenWallet({ userLogin, currentVideoTitle, isDocumentary
     }, 10000)
 
     return () => clearInterval(interval)
-  }, [userLogin, currentSession, wallet, setCurrentSession, setWallet])
+  }, [userLogin, currentSession, wallet, setCurrentSession, setWallet, inParty])
 
   if (!userLogin || !wallet) return null
 

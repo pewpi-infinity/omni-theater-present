@@ -1,14 +1,15 @@
 # Planning Guide
 
-A retro-futuristic video theater platform that presents curated tech documentaries alongside a continuously streaming feed of computing history facts. Features unified token wallet system with user authentication, personal content libraries, quantum analysis, tokenized watch rewards (1 token/hr for movies, 3 tokens/hr for documentaries), AI-powered advertising agent, bonus quiz challenges, community content submission, and cross-repo navigation hub. All authentication, token tracking, and wallet functionality are centralized in a single unified system.
+A retro-futuristic video theater platform that presents curated tech documentaries alongside a continuously streaming feed of computing history facts. Features unified token wallet system with user authentication, personal content libraries, quantum analysis, tokenized watch rewards (1 token/hr for movies, 3 tokens/hr for documentaries, +50% party bonus), AI-powered advertising agent, bonus quiz challenges, community content submission, real-time community chat, synchronized viewing parties with bonus rewards, and cross-repo navigation hub. All authentication, token tracking, and wallet functionality are centralized in a single unified system.
 
 **Experience Qualities**:
 1. **Cinematic** - Immersive theater-like viewing experience with atmospheric presentation
 2. **Rewarding** - Gamified watch-to-earn system incentivizes engagement and learning with transparent transaction tracking
-3. **Educational** - Seamlessly delivers fascinating tech history while entertaining with bonus quizzes
+3. **Social** - Real-time chat and synchronized viewing parties create shared experiences and community connection
+4. **Educational** - Seamlessly delivers fascinating tech history while entertaining with bonus quizzes
 
-**Complexity Level**: Complex Application (advanced functionality with unified tokenization system, AI features, and community systems)
-The app combines video playback, centralized token wallet with complete transaction history, advertising marketplace, quiz challenges, content submission, cross-repo navigation, fact streaming, queue management, user authentication, and AI-powered features with persistent state across sessions.
+**Complexity Level**: Complex Application (advanced functionality with unified tokenization system, AI features, real-time social features, and community systems)
+The app combines video playback, centralized token wallet with complete transaction history, advertising marketplace, quiz challenges, content submission, real-time community chat, synchronized viewing parties, cross-repo navigation, fact streaming, queue management, user authentication, and AI-powered features with persistent state across sessions.
 
 ## Unified Token Wallet Architecture
 
@@ -17,18 +18,20 @@ The app combines video playback, centralized token wallet with complete transact
 The Unified Token Wallet is the central hub that consolidates:
 - **User Authentication State**: Single GitHub login tracked across all components
 - **Token Balance**: One source of truth for total tokens earned and spent
-- **Transaction History**: Complete log of all token operations (earning, spending, bonuses)
-- **Watch Sessions**: Active session tracking with real-time token accumulation
+- **Transaction History**: Complete log of all token operations (earning, spending, bonuses, party bonuses)
+- **Watch Sessions**: Active session tracking with real-time token accumulation and party bonus multipliers
 - **Statistics**: Quiz completions, advertisements created, watch time
 - **Persistence**: All wallet data stored in single KV store key (`unified-wallet`)
 
 **Token Flow:**
-1. **Earning**: Watch time → Unified Wallet (+1 or +3 tokens/hr) → Transaction logged
+1. **Earning**: Watch time → Unified Wallet (+1 or +3 tokens/hr, +50% if in party) → Transaction logged with party bonus note
 2. **Bonus**: Quiz completion → Unified Wallet (+5 or +10 tokens) → Transaction logged → Quiz count incremented
 3. **Spending**: Ad creation → Unified Wallet (-50 tokens) → Transaction logged → Ad count incremented
+4. **Party Bonus**: Active party membership → Automatic +50% multiplier on all watch time earnings → Noted in transaction reasons
 
 **Integration Points:**
-- `UnifiedTokenWallet` component: Main display with balance, stats, session earnings, history access
+- `UnifiedTokenWallet` component: Main display with balance, stats, session earnings, party bonus indicator, history access
+- `ViewingPartySystem`: Triggers party bonus flag when user joins party, clears on leave
 - `BonusQuiz`: Reads wallet balance, deposits bonus tokens, logs transaction
 - `AdvertisingAgent`: Reads wallet balance, deducts tokens, logs transaction
 - `AuthComponent`: Initializes wallet on sign-in
@@ -39,6 +42,7 @@ The Unified Token Wallet is the central hub that consolidates:
 - System auto-migrates on user sign-in if old data exists
 - Transaction history provides complete audit trail
 - No duplicate token tracking systems
+- Party bonuses apply retroactively to active sessions when user joins party
 
 ## Essential Features
 
@@ -154,6 +158,27 @@ The Unified Token Wallet is the central hub that consolidates:
 - **Progression**: User makes purchase → Item immediately appears in library → Sorted by most recent → Shows item type icon, title, category badge, and purchase date → Empty state shown when no purchases exist
 - **Success criteria**: Library updates instantly after purchase, items are clearly categorized by type with appropriate icons and colors, chronological sorting works correctly, empty state is friendly and actionable
 
+### Community Chat (NEW)
+- **Functionality**: Real-time chat system with floating expandable chat bubble, persistent message history, party-specific and global chat channels
+- **Purpose**: Enables community interaction and communication during viewing, creates social atmosphere, enhances viewing party experience
+- **Trigger**: Floating chat button always visible in bottom-right corner showing message count badge
+- **Progression**: User clicks chat bubble → Chat window expands → Shows message history with avatars and timestamps → User types message → Presses enter or send button → Message appears instantly with smooth animation → Messages persist between sessions → Party members see dedicated party chat channel
+- **Success criteria**: Messages sync instantly across all viewers, chat is non-intrusive but accessible, message history persists, party chat is isolated from global chat, user avatars and names display correctly, chat auto-scrolls to newest messages
+
+### Viewing Parties (NEW)
+- **Functionality**: Create or join synchronized viewing parties with real-time member count, host controls, party-specific chat, and automatic +50% token bonus for all participants
+- **Purpose**: Creates shared viewing experiences, encourages community engagement, provides bonus incentives for group watching, enables social interaction around content
+- **Trigger**: Viewing Parties card displays active parties list with "Create Party" button
+- **Progression**: User clicks Create Party → Enters party name → Current video auto-selected → Party created with user as host → Other users see party in active list → Click Join to enter party → All members earn +50% token bonus automatically → Host controls sync to members (future enhancement) → Party chat enabled → Leave button exits party → Member count updates in real-time
+- **Success criteria**: Party creation is instant, active parties display with accurate member counts, join/leave is seamless, token bonus applies automatically to all members, party status shows clearly in UI, host badge displays for creator, party becomes inactive after 5 minutes without activity
+
+### Synchronized Playback (NEW)
+- **Functionality**: Background sync system that tracks party host playback state and coordinates with party members for synchronized viewing
+- **Purpose**: Ensures all party members watch the same content in sync, creates authentic shared viewing experience
+- **Trigger**: Automatically activates when user joins a viewing party
+- **Progression**: User joins party → Sync system initializes → Host playback state broadcasts every 5 seconds → Members receive sync updates → Video changes propagate to all members → Members see notification when host changes video → Host leaving party hands off control or ends party
+- **Success criteria**: Video changes sync within 2-3 seconds, no jarring interruptions to viewing experience, sync respects iframe limitations, host controls work reliably, notifications are clear and non-intrusive
+
 ### Cross-Repo Navigation Hub
 - **Functionality**: Infinity Links section in hamburger menu with themed navigation to other project repos
 - **Purpose**: Creates interconnected ecosystem of project sites (Mario's Castle, Luigi's Factory, etc.)
@@ -165,7 +190,9 @@ The Unified Token Wallet is the central hub that consolidates:
 - **Empty Queue**: Show helpful empty state with "Add video" prompt
 - **Empty Library**: Show helpful empty state when user has no content uploaded
 - **Empty Purchases**: Show friendly empty state encouraging store visit when no items purchased
-- **Not Signed In**: Show sign-in prompt in hamburger menu, hide authenticated features, show token features only when logged in, quantum curation works for all users, store shows sign-in required message
+- **Empty Chat**: Show friendly empty state encouraging first message
+- **No Active Parties**: Show empty state encouraging party creation
+- **Not Signed In**: Show sign-in prompt in hamburger menu, hide authenticated features, show token features only when logged in, quantum curation works for all users, store shows sign-in required message, chat requires sign-in to send messages, viewing parties require sign-in to create/join
 - **Wallet Not Initialized**: Auto-initialize unified wallet on first sign-in with zero balance
 - **Legacy Token Data**: System automatically migrates from old token system (user-tokens) to unified wallet on user sign-in
 - **Invalid URLs**: Validate video URL format before adding to queue
@@ -186,6 +213,14 @@ The Unified Token Wallet is the central hub that consolidates:
 - **Duplicate Purchases**: System allows re-purchasing same item (user may want multiple copies or re-activations)
 - **Store Item Availability**: All items always available (no stock limitations)
 - **Purchase During Session**: Purchases made while watching don't interrupt video playback
+- **Party While In Party**: Disable create/join buttons when already in a party, show current party status
+- **Already In Party**: Prevent joining same party twice, show already joined status
+- **Host Leaves Party**: Party continues with remaining members, oldest member becomes new host
+- **Party Inactivity**: Mark parties inactive after 5 minutes without sync updates
+- **Sync Conflicts**: Members' local controls (play/pause) work but may desync, host sync takes precedence
+- **Chat Message Flood**: No rate limiting currently, messages persist indefinitely
+- **Party Token Bonus**: Automatically applies +50% to all party members, bonus noted in transaction reason
+- **Leave During Earning**: Leaving party mid-session stops bonus but preserves earned tokens
 
 ## Design Direction
 The design should evoke a 1980s computer terminal meets retro cinema aesthetic - think neon glows, scan lines, phosphor green, amber CRT monitors, and early GUI interfaces. The interface should feel like a secret computing museum theater from an alternate 1984 where technology advanced with more style.
@@ -230,41 +265,51 @@ Subtle but purposeful - focus on smooth fact transitions using fade effects and 
   - Switch: Content type toggles (TV Show, Event)
   - Tabs: Store category filtering (All, Videos, Features, Badges, Boosts)
 - **Customizations**:
-  - UnifiedTokenWallet: Central wallet component with real-time balance, session earnings, statistics (quiz/ad counts), transaction history dialog with earning/spending/bonus categorization
+  - UnifiedTokenWallet: Central wallet component with real-time balance, session earnings, statistics (quiz/ad counts), transaction history dialog with earning/spending/bonus categorization, party bonus indicator
   - TokenRedemptionStore: Full-featured store with tabbed categories, featured items highlighting, purchase confirmation flow, balance checking, and unified wallet integration
   - PurchasedLibrary: Trophy case display with chronological sorting, type-based icons and colors, empty state guidance
+  - CommunityChat: Floating expandable chat window with message history, user avatars, timestamps, party-specific channels, real-time updates, auto-scroll
+  - ViewingPartySystem: Party creation dialog, active parties list with join buttons, current party status card, host badge, member count, leave functionality
+  - SyncedPlayback: Background sync component for coordinating playback state between party host and members
   - Quantum Curator: AI-powered recommendation dialog with animated loading states and relevance scoring
-  - Token transaction types: Earned (watch time), Bonus (quizzes), Spent (ads, store purchases) with distinct visual styling
+  - Token transaction types: Earned (watch time), Earned (party bonus), Bonus (quizzes), Spent (ads, store purchases) with distinct visual styling
   - Advertising feed with AI-generated descriptions and unified wallet integration
   - Quiz interface with multiple choice, answer reveal, and unified wallet token deposits
   - Content submission form with type flags and validation
   - Infinity Links section with themed project navigation
   - Documentary detection system for automatic token rate adjustment in unified wallet
+  - Party bonus system: +50% token multiplier for all party members automatically applied
   - Intent history tracking for personalized recommendations
   - Store items with multiple types: video content packs, premium features, profile badges, token multiplier boosts
 - **States**:
   - Buttons: Default (subtle glow), Hover (bright glow), Active (pulsing glow), Disabled (dimmed)
-  - Unified Wallet: Idle (static balance), Earning (animated counter), Transaction updating (smooth transitions)
+  - Unified Wallet: Idle (static balance), Earning (animated counter), Party bonus active (bonus indicator), Transaction updating (smooth transitions)
   - Quiz: Unanswered, Answered (correct/incorrect visual feedback), Completed
   - Ad Creation: Empty, Generating (AI loading), Filled (ready to submit), Insufficient funds (disabled)
   - Quantum Curator: Idle, Analyzing (AI processing), Results (importable recommendations)
   - Store Items: Available (purchasable), Owned (purchased badge), Insufficient Funds (locked), Featured (highlighted)
   - Purchase Flow: Browsing, Confirming (dialog open), Processing (transaction), Completed (success feedback)
+  - Chat: Collapsed (floating button with badge), Expanded (full window), Typing (input active), Empty (no messages)
+  - Viewing Party: Not in party (can create/join), In party (shows status, can leave), Host (crown badge, sync controls), Member (receiving sync)
+  - Party Status: Active (accepting members, earning bonus), Inactive (stale, grayed out)
 - **Icon Selection**:
   - Plus (Add to queue/library, submit, import)
   - Coins, TrendUp, ArrowUp, ArrowDown (Unified wallet, earnings, transactions, spending)
   - Clock (Transaction history)
-  - Sparkle (AI features, quantum curation, bonus rewards, premium features)
+  - Sparkle (AI features, quantum curation, bonus rewards, premium features, party bonuses)
   - Megaphone (Advertising)
   - Brain, Check, X (Quiz system)
   - VideoCamera (Content submission, video packs)
   - Infinity (Cross-repo navigation)
   - House, Package, Wrench, Factory, Plant (Themed project icons)
   - ShoppingCart, ShoppingBag (Store and purchases)
-  - Star, Trophy, Crown (Badges and achievements)
+  - Star, Trophy, Crown (Badges, achievements, party host)
   - Lightning (Token boosts and multipliers)
   - Gift (Mystery packs)
   - Lock (Locked/unavailable items)
   - FilmSlate (Available for purchase)
-- **Spacing**: Generous padding (p-6 to p-8) around content blocks, consistent gap-4 between related elements, gap-6 between major sections, unified wallet with prominent placement, store with grid layout
-- **Mobile**: Single column stack - video on top, quantum curation button below header, unified token wallet below (if logged in with expanded view), facts panel, advertising and submission in stacked cards, quiz, token store (full width with responsive grid), purchased library (if has items), hamburger menu slides over with full navigation
+  - ChatCircle, PaperPlaneRight (Chat interface, send message)
+  - Users (Party members, community count)
+  - SignIn, SignOut (Join/leave party)
+- **Spacing**: Generous padding (p-6 to p-8) around content blocks, consistent gap-4 between related elements, gap-6 between major sections, unified wallet with prominent placement, store with grid layout, chat floating and non-intrusive
+- **Mobile**: Single column stack - video on top, quantum curation button below header, unified token wallet below (if logged in with expanded view showing party bonus if active), facts panel, viewing parties card, advertising and submission in stacked cards, quiz, token store (full width with responsive grid), purchased library (if has items), hamburger menu slides over with full navigation, chat bubble fixed in corner scaling responsively, chat window adapts to mobile viewport

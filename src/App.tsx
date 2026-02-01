@@ -12,7 +12,7 @@ import { Plus, Trash, ArrowRight, FilmStrip, Pause, Play } from '@phosphor-icons
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
 import { INITIAL_FACTS } from '@/lib/facts'
-import { QueueVideo, Fact, UserContent } from '@/lib/types'
+import { QueueVideo, Fact, UserContent, ViewingParty } from '@/lib/types'
 import { HamburgerMenu } from '@/components/HamburgerMenu'
 import { QuantumAnalyzer } from '@/components/QuantumAnalyzer'
 import { QuantumAutoPlay } from '@/components/QuantumAutoPlay'
@@ -23,6 +23,9 @@ import { ContentSubmission } from '@/components/ContentSubmission'
 import { QuantumCurator } from '@/components/QuantumCurator'
 import { TokenRedemptionStore } from '@/components/TokenRedemptionStore'
 import { PurchasedLibrary } from '@/components/PurchasedLibrary'
+import { CommunityChat } from '@/components/CommunityChat'
+import { ViewingPartySystem } from '@/components/ViewingPartySystem'
+import { SyncedPlayback } from '@/components/SyncedPlayback'
 
 function App() {
   const [facts, setFacts] = useKV<Fact[]>('facts', INITIAL_FACTS)
@@ -44,6 +47,7 @@ function App() {
   const [newContentTitle, setNewContentTitle] = useState('')
   const [isPaused, setIsPaused] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
+  const [currentParty, setCurrentParty] = useState<ViewingParty | null>(null)
 
   useEffect(() => {
     if (!facts || facts.length === 0 || isPaused) return
@@ -150,6 +154,14 @@ Return ONLY the subtitle text, nothing else.`
 
   const handleFactDragEnd = () => {
     setIsDragging(false)
+  }
+
+  const handlePartyJoin = (party: ViewingParty) => {
+    setCurrentParty(party)
+  }
+
+  const handlePartyLeave = () => {
+    setCurrentParty(null)
   }
 
   const currentFact = facts?.[currentFactIndex]
@@ -483,12 +495,23 @@ Return ONLY the subtitle text, nothing else.`
             userLogin={userLogin ?? null} 
             currentVideoTitle={currentVideoTitle ?? 'Video'} 
             isDocumentary={isDocumentary ?? false}
+            inParty={!!currentParty}
           />
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <AdvertisingAgent userLogin={userLogin ?? null} />
-          <ContentSubmission userLogin={userLogin ?? null} />
+          <ViewingPartySystem
+            userLogin={userLogin ?? null}
+            currentVideo={currentVideo ?? ''}
+            currentVideoTitle={currentVideoTitle ?? 'Video'}
+            onPartyJoin={handlePartyJoin}
+            onPartyLeave={handlePartyLeave}
+            currentParty={currentParty}
+          />
+          <div className="space-y-6">
+            <AdvertisingAgent userLogin={userLogin ?? null} />
+            <ContentSubmission userLogin={userLogin ?? null} />
+          </div>
         </div>
 
         <BonusQuiz 
@@ -501,6 +524,18 @@ Return ONLY the subtitle text, nothing else.`
 
         {userLogin && <PurchasedLibrary userLogin={userLogin ?? null} />}
       </div>
+
+      <SyncedPlayback
+        partyId={currentParty?.id ?? null}
+        isHost={currentParty?.hostId === userLogin}
+        userLogin={userLogin ?? null}
+        onVideoChange={handlePlayVideo}
+      />
+
+      <CommunityChat 
+        userLogin={userLogin ?? null}
+        partyId={currentParty?.id}
+      />
     </div>
   )
 }

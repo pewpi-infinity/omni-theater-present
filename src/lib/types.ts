@@ -61,3 +61,35 @@ export interface Quiz {
   correctAnswer: number
   bonusTokens: number
 }
+
+export interface ChatMessage {
+  id: string
+  userId: string
+  username: string
+  avatarUrl: string
+  message: string
+  timestamp: number
+  partyId?: string
+}
+
+export interface ViewingParty {
+  id: string
+  name: string
+  hostId: string
+  hostName: string
+  videoUrl: string
+  videoTitle: string
+  createdAt: number
+  isActive: boolean
+  memberCount: number
+  currentTime: number
+  isPlaying: boolean
+  lastSync: number
+}
+
+export interface PartyMember {
+  userId: string
+  username: string
+  avatarUrl: string
+  joinedAt: number
+}
