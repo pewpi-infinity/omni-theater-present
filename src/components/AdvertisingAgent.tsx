@@ -33,6 +33,11 @@ export function AdvertisingAgent({ userLogin }: AdvertisingAgentProps) {
       return
     }
 
+    if (!window.spark) {
+      toast.error('SDK not ready. Please try again in a moment.')
+      return
+    }
+
     setIsGenerating(true)
     try {
       // @ts-expect-error - spark.llmPrompt template tag type inference issue

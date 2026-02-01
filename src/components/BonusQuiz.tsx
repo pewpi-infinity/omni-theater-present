@@ -36,6 +36,11 @@ export function BonusQuiz({ userLogin, currentVideoTitle, isDocumentary }: Bonus
       return
     }
 
+    if (!window.spark) {
+      toast.error('SDK not ready. Please try again in a moment.')
+      return
+    }
+
     setIsGenerating(true)
     try {
       const bonusTokens = getQuizReward(isDocumentary)

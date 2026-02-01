@@ -14,6 +14,11 @@ export function AuthComponent({ userLogin, onLoginChange }: AuthComponentProps) 
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSignIn = async () => {
+    if (!window.spark) {
+      toast.error('SDK not ready. Please wait a moment.')
+      return
+    }
+    
     setIsLoading(true)
     try {
       const user = await window.spark.user()
@@ -24,6 +29,7 @@ export function AuthComponent({ userLogin, onLoginChange }: AuthComponentProps) 
         toast.error('Unable to retrieve user information')
       }
     } catch (error) {
+      console.error('Sign in error:', error)
       toast.error('Failed to sign in')
     } finally {
       setIsLoading(false)

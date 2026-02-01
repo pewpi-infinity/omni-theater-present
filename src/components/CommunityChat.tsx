@@ -30,11 +30,13 @@ export function CommunityChat({ userLogin, partyId }: CommunityChatProps) {
   const displayMessages = partyId ? partyMessages || [] : messages || []
 
   useEffect(() => {
-    if (userLogin) {
+    if (userLogin && window.spark) {
       window.spark.user().then((user) => {
         if (user) {
           setUserInfo({ login: user.login, avatarUrl: user.avatarUrl })
         }
+      }).catch((error) => {
+        console.error('Failed to fetch user info in chat:', error)
       })
     }
   }, [userLogin])

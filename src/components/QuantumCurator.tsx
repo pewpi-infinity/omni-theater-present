@@ -29,6 +29,11 @@ export function QuantumCurator({ userLogin, onImportVideo }: QuantumCuratorProps
   const [userIntentHistory, setUserIntentHistory] = useKV<string[]>('user-intent-history', [])
 
   const handleAnalyze = async () => {
+    if (!window.spark) {
+      toast.error('SDK not ready. Please try again in a moment.')
+      return
+    }
+    
     setIsAnalyzing(true)
     setIsOpen(true)
     

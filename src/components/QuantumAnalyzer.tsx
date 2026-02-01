@@ -18,6 +18,11 @@ export function QuantumAnalyzer({ movieTitle }: QuantumAnalyzerProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
 
   const handleAnalyze = async () => {
+    if (!window.spark) {
+      toast.error('SDK not ready. Please try again in a moment.')
+      return
+    }
+    
     setIsAnalyzing(true)
     setIsOpen(true)
     

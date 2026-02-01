@@ -76,9 +76,17 @@ function AppContent() {
   }, [safeFacts.length, currentFactIndex])
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsInitialized(true)
-    }, 100)
+    const checkInitialization = () => {
+      if (typeof window !== 'undefined' && window.spark) {
+        console.log('[App] Spark SDK confirmed available, initializing...')
+        setIsInitialized(true)
+      } else {
+        console.warn('[App] Spark SDK not yet available, retrying...')
+        setTimeout(checkInitialization, 100)
+      }
+    }
+    
+    const timer = setTimeout(checkInitialization, 50)
     return () => clearTimeout(timer)
   }, [])
 
@@ -763,7 +771,7 @@ export default function App() {
               {errorMessage}
             </p>
             {errorStack && (
-              <pre className="text-xs text-left text-muted-foreground bg-muted/20 p-2 rounded max-h-32 overflow-auto">
+              <pre className="text-xs text-left text-muted-foreground bg-muted/20 p-2 rounded max-h-32 overflow-auto font-mono">
                 {errorStack}
               </pre>
             )}

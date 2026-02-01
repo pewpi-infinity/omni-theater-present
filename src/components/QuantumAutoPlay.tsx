@@ -35,7 +35,7 @@ export function QuantumAutoPlay({
   const [isDismissed, setIsDismissed] = useState(false)
 
   useEffect(() => {
-    if (queue.length === 0 || isDismissed) return
+    if (queue.length === 0 || isDismissed || !window.spark) return
 
     const analyzeNextVideo = async () => {
       setIsAnalyzing(true)
