@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,8 +36,9 @@ function App() {
   const [userLogin, setUserLogin] = useKV<string | null>('user-login', null)
   const [userContent, setUserContent] = useKV<UserContent[]>('user-content', [])
   const [factSpeed, setFactSpeed] = useKV<number>('fact-speed', 15)
-  const [isDocumentary, setIsDocumentary] = useKV<boolean>('is-documentary', false)
+  const [isDocumentary, setIsDocumentary] = useKV<boolean>('is-documentary', true)
   const [videoSubtitle, setVideoSubtitle] = useState<string>('A Journey Through Computing History')
+  const [viewingFee, setViewingFee] = useKV<number>('viewing-fee-tokens', 0)
   
   const [currentFactIndex, setCurrentFactIndex] = useState(0)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -121,8 +123,20 @@ function App() {
                   titleLower.includes('educational') || 
                   titleLower.includes('history') ||
                   titleLower.includes('tech talk') ||
-                  titleLower.includes('presentation')
+                  titleLower.includes('presentation') ||
+                  titleLower.includes('pirates') ||
+                  titleLower.includes('silicon valley')
     setIsDocumentary(isDoc)
+    
+    const isPiratesMovie = titleLower.includes('pirates') && titleLower.includes('silicon valley')
+    const fee = isPiratesMovie ? 10 : 0
+    setViewingFee(fee)
+    
+    if (fee > 0) {
+      toast.info(`Viewing fee: ${fee} tokens`, { 
+        description: 'You will earn tokens while watching!' 
+      })
+    }
     
     try {
       const promptText = `Generate a short, catchy subtitle (maximum 8 words) for a video titled "${title || 'Video'}". The subtitle should capture the essence or theme of the content. Return ONLY the subtitle text, nothing else.`
@@ -281,9 +295,18 @@ function App() {
               </div>
               <div className="p-4 bg-card/50 backdrop-blur border-t border-primary/20">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-sm uppercase tracking-wide text-foreground">
-                    {currentVideoTitle}
-                  </h3>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm uppercase tracking-wide text-foreground">
+                      {currentVideoTitle}
+                    </h3>
+                    {(viewingFee ?? 0) > 0 && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <Badge variant="outline" className="border-accent/50 text-accent text-xs">
+                          Viewing Fee: {viewingFee} tokens
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
                   <QuantumAnalyzer movieTitle={currentVideoTitle || 'Video'} />
                 </div>
               </div>
