@@ -360,9 +360,13 @@ function AppContent() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="inline-block">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="inline-block"
+          >
             <FilmStrip size={48} className="text-primary" weight="duotone" />
-          </div>
+          </motion.div>
           <p className="text-muted-foreground font-mono text-sm">
             Loading Omni Theater...
           </p>
@@ -377,11 +381,10 @@ function AppContent() {
 
   console.log('[App] Rendering main content')
 
-  try {
-    return (
-      <>
-        <Toaster position="top-center" />
-        <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
+  return (
+    <>
+      <Toaster position="top-center" />
+      <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl space-y-6">
         <header className="space-y-4">
           <div className="flex items-start justify-between gap-4">
@@ -785,28 +788,7 @@ function AppContent() {
       </SafeComponent>
       </div>
     </>
-    )
-  } catch (error) {
-    console.error('[App] Render error:', error)
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="max-w-lg w-full p-6 border-destructive/30 bg-card/50">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <FilmStrip size={32} className="text-destructive" weight="duotone" />
-              <h1 className="text-xl font-bold text-destructive">Render Error</h1>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {error instanceof Error ? error.message : 'Unknown render error'}
-            </p>
-            <Button onClick={() => window.location.reload()}>
-              Reload Page
-            </Button>
-          </div>
-        </Card>
-      </div>
-    )
-  }
+  )
 }
 
 export default function App() {
