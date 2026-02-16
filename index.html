@@ -1,19 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Omni Theater Presents</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="/src/main.css" rel="stylesheet" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>omni-theater-present</title>
+<meta name="infinity-token-id" content="🧱Kris🔑"/>
+<meta name="mongoose-os-intent" content="build, connect, grow, serve"/>
+<meta name="spark-role" content="Spark Node"/>
+<style>
+:root{--bg:#0b0f14;--sf:#111822;--cd:#161d2a;--bd:#222d3d;--ac:#6366f1;--gold:#f5c542;--text:#e6edf3;--mt:#8b949e;--green:#3fb950;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;line-height:1.5;overflow-x:hidden;}
+a{color:var(--ac);text-decoration:none;}
+
+.hdr{background:var(--sf);padding:10px 12px;border-bottom:2px solid var(--ac);position:sticky;top:0;z-index:50;}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;}
+.logo{font-weight:800;font-size:1rem;}
+.logo em{color:var(--ac);font-style:normal;}
+.nav{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+.nav a{font-size:0.7rem;padding:3px 7px;border:1px solid var(--bd);border-radius:6px;color:var(--text);white-space:nowrap;}
+.nav a:hover{background:rgba(255,255,255,0.06);}
+
+.hero{text-align:center;padding:24px 12px;background:radial-gradient(ellipse at top,rgba(99,102,241,0.15),transparent 70%);}
+.hero-icon{font-size:3.5rem;}
+.hero h1{font-size:1.3rem;margin:6px 0;}
+.hero p{color:var(--mt);font-size:0.85rem;max-width:500px;margin:0 auto;}
+.hero .role{display:inline-block;background:rgba(99,102,241,0.2);border:1px solid var(--ac);border-radius:20px;padding:4px 12px;font-size:0.7rem;color:var(--ac);font-weight:700;margin-top:8px;}
+
+.action-bar{display:flex;gap:6px;flex-wrap:wrap;padding:12px;background:var(--sf);border-bottom:1px solid var(--bd);justify-content:center;}
+.action-btn{min-width:40px;height:40px;border:1px solid var(--bd);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;background:transparent;transition:all 0.15s;}
+.action-btn:hover{transform:translateY(-2px);background:rgba(255,255,255,0.06);}
+.action-btn.active{background:rgba(99,102,241,0.25);border-color:var(--ac);}
+
+.qv-panel{display:none;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px;margin:8px 12px;}
+.qv-panel.open{display:block;}
+.qv-title{color:var(--ac);font-size:0.85rem;font-weight:700;margin-bottom:8px;}
+.qv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;}
+.qv-card{background:var(--cd);border:1px solid var(--bd);border-radius:8px;padding:8px;font-size:0.7rem;}
+.qv-card strong{color:var(--text);}
+.qv-card div{color:var(--mt);font-size:0.65rem;margin-top:2px;}
+
+.section{padding:12px;border-bottom:1px solid var(--bd);}
+.section h2{font-size:0.95rem;margin-bottom:8px;color:var(--gold);}
+
+.spark-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;}
+.spark-node{background:var(--cd);border:1px solid var(--bd);border-radius:8px;padding:8px;text-align:center;font-size:0.65rem;transition:all 0.15s;}
+.spark-node:hover{border-color:var(--ac);}
+.spark-icon{font-size:1.3rem;}
+.spark-name{margin-top:4px;font-weight:600;}
+
+.intent{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px;margin:12px;}
+.intent h3{color:var(--ac);font-size:0.85rem;margin-bottom:6px;}
+.intent p{font-size:0.75rem;color:var(--mt);margin:4px 0;}
+.intent code{background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.7rem;}
+
+.eco-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding:8px;}
+.eco-chip{background:var(--cd);border:1px solid var(--bd);border-radius:20px;padding:4px 10px;font-size:0.65rem;white-space:nowrap;}
+.eco-chip:hover{border-color:var(--gold);}
+
+.chat-fab{position:fixed;right:10px;bottom:10px;z-index:999;background:rgba(0,0,0,0.85);color:#fff;border:1px solid var(--bd);border-radius:999px;padding:8px 12px;font-weight:700;font-size:0.75rem;cursor:pointer;}
+.chat-panel{position:fixed;right:6px;bottom:50px;z-index:999;width:calc(100vw - 12px);max-width:360px;height:min(350px,55vh);background:rgba(11,15,20,0.95);border:1px solid var(--bd);border-radius:10px;display:none;flex-direction:column;overflow:hidden;}
+.chat-head{padding:6px 10px;font-weight:700;font-size:0.8rem;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;}
+.chat-body{flex:1;overflow-y:auto;padding:6px;font-family:monospace;font-size:0.7rem;}
+.chat-line{margin:3px 0;white-space:pre-wrap;}
+.chat-bar{display:flex;gap:4px;padding:6px;border-top:1px solid var(--bd);}
+.chat-in{flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--bd);border-radius:6px;padding:5px 8px;color:#fff;outline:none;font-size:0.75rem;}
+.chat-send{background:var(--ac);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer;font-size:0.75rem;}
+
+.footer{text-align:center;padding:12px;font-size:0.65rem;color:var(--mt);border-top:1px solid var(--bd);}
+</style>
 </head>
-
 <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-</body>
 
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="logo"><em>⚡ omni-theater-present</em></div>
+    <span style="font-size:0.7rem;color:var(--mt);">🧱Kris🔑</span>
+  </div>
+  <div class="nav">
+    <a href="https://pewpi-infinity.github.io/infinity-crown-index/">👑 Crown</a>
+    <a href="https://pewpi-infinity.github.io/infinity-spark-hub/">🌐 Hub</a>
+    <a href="https://pewpi-infinity.github.io/infinity-spark-market/">💰 Market</a>
+    <a href="https://pewpi-infinity.github.io/smug_look/">🧱 Octave</a>
+    <a href="https://pewpi-infinity.github.io/MARIO-TOKENS/">🎮 Mario</a>
+    <a href="https://pewpi-infinity.github.io/infinity-spark-core/">⚡ Core</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-icon">⚡</div>
+  <h1>Spark Omni Theater Present</h1>
+  <p>Spark node in the Infinity network</p>
+  <div class="role">Spark Node</div>
+</div>
+
+<div class="action-bar" id="action-bar">
+  <button class="action-btn" data-action="double" title="Double content">🍄</button>
+  <button class="action-btn" data-action="wallet" title="Token Wallet">🟡</button>
+  <button class="action-btn" data-action="trending" title="Trending">⭐</button>
+  <button class="action-btn" data-action="royal" title="Royal Treatment">👑</button>
+  <button class="action-btn" data-action="facet" title="Facet">💎</button>
+  <button class="action-btn" data-action="hash" title="Hash Protect">🧱</button>
+  <button class="action-btn" data-action="autobot" title="Auto-Bot">🦾</button>
+  <button class="action-btn" data-action="pull" title="Pull">🧲</button>
+  <button class="action-btn" data-action="search" title="Search">🕹️</button>
+</div>
+<div class="qv-panel" id="qv-panel">
+  <div class="qv-title" id="qv-title"></div>
+  <div class="qv-grid" id="qv-grid"></div>
+</div>
+
+<div class="section">
+  <h2>⚡ Spark Network</h2>
+  <div class="spark-grid" id="spark-grid"></div>
+</div>
+
+<div class="intent">
+  <h3>🧠 Mongoose.OS Soul Intent</h3>
+  <p><strong>Role:</strong> <code>Spark Node</code></p>
+  <p><strong>Mission:</strong> Spark node in the Infinity network</p>
+  <p><strong>Intent:</strong> Build, connect, grow, serve. Every spark knows its position.</p>
+  <p><strong>Position:</strong> <code>omni-theater-present</code> → Spark Core → Crown Index → Marketplace</p>
+</div>
+
+<div class="section">
+  <h2>🔗 Ecosystem</h2>
+  <div class="eco-row">
+    <a class="eco-chip" href="https://pewpi-infinity.github.io/infinity-crown-index/">👑 Crown Index</a>
+    <a class="eco-chip" href="https://pewpi-infinity.github.io/infinity-spark-hub/">🌐 Spark Hub</a>
+    <a class="eco-chip" href="https://pewpi-infinity.github.io/infinity-spark-market/">💰 Marketplace</a>
+    <a class="eco-chip" href="https://pewpi-infinity.github.io/infinity-spark-core/">⚡ Spark Core</a>
+    <a class="eco-chip" href="https://pewpi-infinity.github.io/smug_look/">🧱 Octave</a>
+    <a class="eco-chip" href="https://pewpi-infinity.github.io/MARIO-TOKENS/">🎮 Mario Tokens</a>
+    <a class="eco-chip" href="https://pewpi-infinity.github.io/infinity-spark-portal/">🌀 Portal</a>
+    <a class="eco-chip" href="https://pewpi-infinity.github.io/infinity-spark-terminal/">🖥️ Terminal</a>
+  </div>
+</div>
+
+<div class="footer">
+  omni-theater-present &mdash; Spark Node &mdash; Part of <a href="https://pewpi-infinity.github.io/infinity-crown-index/">Infinity Crown System</a><br/>
+  <a href="https://pewpi-infinity.github.io/infinity-spark-market/">Buy on Marketplace</a> | mongoose.os guided
+</div>
+
+<div class="chat-fab" id="cf">🧱 Chat</div>
+<div class="chat-panel" id="cp">
+  <div class="chat-head"><span>🧱 Omni Theater Present Terminal</span><span id="cc" style="cursor:pointer">✕</span></div>
+  <div class="chat-body" id="cb">
+    <div class="chat-line" style="color:var(--gold)">Welcome to omni-theater-present</div>
+    <div class="chat-line" style="color:var(--mt)">Commands: help, role, sparks, status, ecosystem</div>
+  </div>
+  <div class="chat-bar">
+    <input class="chat-in" id="ci" placeholder="Type a command..."/>
+    <button class="chat-send" id="cs">GO</button>
+  </div>
+</div>
+
+<script>
+// Spark Network Grid
+const SPARKS=[
+  {n:"core",i:"💎"},{n:"bridge",i:"🌉"},{n:"terminal",i:"🖥️"},{n:"engine",i:"🔧"},
+  {n:"hub",i:"🌐"},{n:"relay",i:"📡"},{n:"forge",i:"🔥"},{n:"vault",i:"🔐"},
+  {n:"mint",i:"🏭"},{n:"token",i:"🪙"},{n:"portal",i:"🌀"},{n:"lab",i:"🧪"},
+  {n:"beacon",i:"🗼"},{n:"nexus",i:"🔗"},{n:"reactor",i:"⚛️"},{n:"matrix",i:"🟩"},
+  {n:"ledger",i:"📒"},{n:"scanner",i:"🔍"},{n:"builder",i:"👷"},{n:"writer",i:"✍️"},
+  {n:"theater",i:"🎭"},{n:"console",i:"💻"},{n:"search",i:"🔎"},{n:"signal",i:"📶"},
+  {n:"stream",i:"🌊"},{n:"network",i:"🌐"},{n:"vision",i:"👁️"},{n:"studio",i:"🎨"},
+  {n:"launchpad",i:"🚀"},{n:"market",i:"💰"}
+];
+const sg=document.getElementById("spark-grid");
+sg.innerHTML=SPARKS.map(s=>`<a class="spark-node" href="https://pewpi-infinity.github.io/infinity-spark-${s.n}/"><div class="spark-icon">${s.i}</div><div class="spark-name">${s.n}</div></a>`).join("");
+
+// Quantum Vector Buttons
+const QV={
+  double:{t:"🍄 Double Content",items:["Deep Research x2","Source Expander","Content Mirror","Facet Multiplier"]},
+  wallet:{t:"🟡 Token Wallet",items:["Token Balance","Mint Token","Transfer","History"]},
+  trending:{t:"⭐ Trending",items:["Trend Scanner","SEO Injector","Viral Builder","Comparison"]},
+  royal:{t:"👑 Royal Treatment",items:["AI Guide Suite","Trivia Games","Full Research","Content Perfector","Link Builder","Token Rewards"]},
+  facet:{t:"💎 Facet Extract",items:["Chunk Extractor","Diamond Cutter","Build Carrier","Facet Archive"]},
+  hash:{t:"🧱 Hash Protect",items:["Login Gate","Hash Encoder","Access Control","Integrity Check"]},
+  autobot:{t:"🦾 Auto-Bot",items:["Auto Re-check","Content Bot","Link Bot","Growth Bot"]},
+  pull:{t:"🧲 Pull",items:["Pull Content","Pull Structure","Pull Tokens","Pull Connections"]},
+  search:{t:"🕹️ Search",items:["Full Text Search","Spark Search","Ecosystem Search","Token Search"]}
+};
+document.querySelectorAll(".action-btn").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".action-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const a=btn.dataset.action,d=QV[a];
+    if(d){
+      document.getElementById("qv-title").textContent=d.t;
+      document.getElementById("qv-grid").innerHTML=d.items.map(i=>`<div class="qv-card"><strong>${i}</strong><div>Ready</div></div>`).join("");
+      document.getElementById("qv-panel").classList.add("open");
+    }
+  };
+});
+
+// Rogers Chat
+(function(){
+  const fab=document.getElementById("cf"),panel=document.getElementById("cp"),
+    body=document.getElementById("cb"),input=document.getElementById("ci"),
+    send=document.getElementById("cs"),close=document.getElementById("cc");
+  function line(t,c){const d=document.createElement("div");d.className="chat-line";if(c)d.style.color=c;d.textContent=t;body.appendChild(d);body.scrollTop=body.scrollHeight;}
+  fab.onclick=()=>{panel.style.display="flex";input.focus();};
+  close.onclick=()=>{panel.style.display="none";};
+  function run(){
+    const q=(input.value||"").trim().toLowerCase();if(!q)return;
+    line("> "+q,"var(--ac)");input.value="";
+    if(q==="help")line("Commands: help, role, sparks, status, ecosystem","var(--mt)");
+    else if(q==="role")line("⚡ Role: Spark Node - Spark node in the Infinity network","var(--gold)");
+    else if(q==="sparks")line("30 spark nodes connected via Crown Index","var(--gold)");
+    else if(q==="status")line("⚡ omni-theater-present: ONLINE | Connected to Crown","var(--green)");
+    else if(q==="ecosystem")line("👑Crown 🌐Hub 💰Market ⚡Core 🧱Octave 🎮Mario","var(--gold)");
+    else line("Unknown. Try: help","var(--mt)");
+  }
+  send.onclick=run;input.onkeydown=e=>{if(e.key==="Enter")run();};
+})();
+</script>
+</body>
 </html>
