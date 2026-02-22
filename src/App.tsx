@@ -28,6 +28,7 @@ import { CommunityChat } from '@/components/CommunityChat'
 import { ViewingPartySystem } from '@/components/ViewingPartySystem'
 import { SyncedPlayback } from '@/components/SyncedPlayback'
 import { SafeComponent } from '@/components/SafeComponent'
+import { VideoPlayer } from '@/components/VideoPlayer'
 
 function AppContent() {
   console.log('[App] Starting render')
@@ -493,12 +494,7 @@ function AppContent() {
           <div className="lg:col-span-2 space-y-6">
             <Card className="overflow-hidden border-primary/30 glow-cyan scan-lines">
               <div className="aspect-video bg-black">
-                <iframe
-                  src={currentVideo || ''}
-                  className="w-full h-full"
-                  allowFullScreen
-                  title="Video Player"
-                />
+                <VideoPlayer url={currentVideo || ''} title={currentVideoTitle ?? 'Video'} />
               </div>
               <div className="p-4 bg-card/50 backdrop-blur border-t border-primary/20">
                 <div className="flex items-center justify-between">
