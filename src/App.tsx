@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
-import { Plus, Trash, ArrowRight, FilmStrip, Pause, Play } from '@phosphor-icons/react'
+import { Plus, Trash, ArrowLeft, ArrowRight, FilmStrip, Pause, Play } from '@phosphor-icons/react'
 import { toast, Toaster } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
 import { INITIAL_FACTS } from '@/lib/facts'
@@ -556,6 +556,14 @@ function AppContent() {
                 />
 
                 <div className="flex items-start justify-between gap-4">
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={handlePreviousFact}
+                    className="shrink-0 border-primary/50 hover:border-primary hover:bg-primary/10 hover:glow-cyan transition-all"
+                  >
+                    <ArrowLeft className="text-primary" weight="bold" />
+                  </Button>
                   <div 
                     className="flex-1 min-h-[120px] cursor-grab active:cursor-grabbing"
                     onMouseDown={handleFactDragStart}
