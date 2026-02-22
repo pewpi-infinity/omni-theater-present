@@ -767,6 +767,7 @@ function AppContent() {
             <PurchasedLibrary userLogin={userLogin ?? null} />
           </SafeComponent>
         )}
+        </div>
       </div>
 
       <SafeComponent componentName="SyncedPlayback">
