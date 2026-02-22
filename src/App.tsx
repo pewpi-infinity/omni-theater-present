@@ -513,7 +513,6 @@ function AppContent() {
                       </div>
                     )}
                   </div>
-                </div>
               </div>
             </Card>
 
