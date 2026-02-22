@@ -784,7 +784,6 @@ function AppContent() {
           partyId={currentParty?.id}
         />
       </SafeComponent>
-      </div>
     </>
   )
 }
