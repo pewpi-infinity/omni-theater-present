@@ -11,13 +11,6 @@ export interface QueueVideo {
   addedAt: number
 }
 
-export interface QuantumReport {
-  movieTitle: string
-  timestamp: number
-  analysis: string
-  quantumFactors: string[]
-}
-
 export interface UserContent {
   id: string
   url: string

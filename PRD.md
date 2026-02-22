@@ -1,6 +1,6 @@
 # Planning Guide
 
-A retro-futuristic video theater platform that presents curated tech documentaries alongside a continuously streaming feed of computing history facts. Features unified token wallet system with user authentication, personal content libraries, quantum analysis, tokenized watch rewards (1 token/hr for movies, 3 tokens/hr for documentaries, +50% party bonus), AI-powered advertising agent, bonus quiz challenges, community content submission, real-time community chat, synchronized viewing parties with bonus rewards, and cross-repo navigation hub. All authentication, token tracking, and wallet functionality are centralized in a single unified system.
+A retro-futuristic video theater platform that presents curated tech documentaries alongside a continuously streaming feed of computing history facts. Features unified token wallet system with user authentication, personal content libraries, tokenized watch rewards (1 token/hr for movies, 3 tokens/hr for documentaries, +50% party bonus), AI-powered advertising agent, bonus quiz challenges, community content submission, real-time community chat, synchronized viewing parties with bonus rewards, and cross-repo navigation hub. All authentication, token tracking, and wallet functionality are centralized in a single unified system.
 
 **Experience Qualities**:
 1. **Cinematic** - Immersive theater-like viewing experience with atmospheric presentation
@@ -66,13 +66,6 @@ The Unified Token Wallet is the central hub that consolidates:
 - **Trigger**: Auto-starts on page load, cycles through facts automatically unless paused
 - **Progression**: App loads → Facts begin auto-rotating → User can adjust speed slider (5-30s) → User can pause/play → User can swipe left/right to navigate → Smooth fade transitions between facts
 - **Success criteria**: Facts are readable, transitions are smooth, timing feels natural, user controls are responsive, swipe gestures work intuitively
-
-### Quantum Report Generator
-- **Functionality**: AI-powered analysis of movie titles generating quantum computing and tech innovation perspectives
-- **Purpose**: Provides unique, engaging insights connecting movies to quantum and computing concepts
-- **Trigger**: User clicks "Quantum Report" button below video player
-- **Progression**: User clicks button → Dialog opens with loading animation → AI analyzes movie title → Report displays with analysis and 5 quantum factors → Smooth animations reveal content
-- **Success criteria**: Analysis is relevant and engaging, quantum factors are insightful, loading state is clear, animations are smooth
 
 ### User Authentication
 - **Functionality**: GitHub-based user authentication with persistent login state that initializes unified wallet

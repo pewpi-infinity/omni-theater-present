@@ -15,7 +15,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { INITIAL_FACTS } from '@/lib/facts'
 import { QueueVideo, Fact, UserContent, ViewingParty } from '@/lib/types'
 import { HamburgerMenu } from '@/components/HamburgerMenu'
-import { QuantumAnalyzer } from '@/components/QuantumAnalyzer'
 import { QuantumAutoPlay } from '@/components/QuantumAutoPlay'
 import { UnifiedTokenWallet } from '@/components/UnifiedTokenWallet'
 import { AdvertisingAgent } from '@/components/AdvertisingAgent'
@@ -433,7 +432,6 @@ function AppContent() {
                       </div>
                     )}
                   </div>
-                  <QuantumAnalyzer movieTitle={currentVideoTitle || 'Video'} />
                 </div>
               </div>
             </Card>
