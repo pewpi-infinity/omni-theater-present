@@ -385,8 +385,8 @@ function AppContent() {
       <Toaster position="top-center" />
       <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl space-y-6">
-        <header className="space-y-4">
-          <div className="flex items-start justify-between gap-4">
+          <header className="space-y-4">
+            <div className="flex items-start justify-between gap-4">
             <SafeComponent componentName="HamburgerMenu">
               <HamburgerMenu
                 onSelectVideo={handlePlayVideo}
