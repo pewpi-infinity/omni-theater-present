@@ -15,7 +15,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { INITIAL_FACTS } from '@/lib/facts'
 import { QueueVideo, Fact, UserContent, ViewingParty } from '@/lib/types'
 import { HamburgerMenu } from '@/components/HamburgerMenu'
-import { QuantumAutoPlay } from '@/components/QuantumAutoPlay'
 import { UnifiedTokenWallet } from '@/components/UnifiedTokenWallet'
 import { AdvertisingAgent } from '@/components/AdvertisingAgent'
 import { BonusQuiz } from '@/components/BonusQuiz'
@@ -433,7 +432,6 @@ function AppContent() {
                     )}
                   </div>
                 </div>
-              </div>
             </Card>
 
             <Card className="p-6 border-secondary/30 bg-card/50 backdrop-blur">
